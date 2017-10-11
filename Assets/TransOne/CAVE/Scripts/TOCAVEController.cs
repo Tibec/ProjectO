@@ -225,12 +225,13 @@ public class TOCAVEController : MonoBehaviour
 				}
 				Screen.SetResolution(xMax-xMin, yMax-yMin,false);
 
-				#if !UNITY_EDITOR
-				StartCoroutine("SetPositionHack");
-				#endif
+#if !UNITY_EDITOR
+                if(VRSettings.enabled)
+				    StartCoroutine("SetPositionHack");
+#endif
 
-			}
-			else 
+            }
+            else 
 			{
 				Screen.SetResolution((int)TOParameters.displayParameters.displays[targetDisplay].resolution.x, 
 					(int)TOParameters.displayParameters.displays[targetDisplay].resolution.y, 

@@ -1,0 +1,89 @@
+{
+    "displays": [
+        {
+            "name": "Display 0",
+            "resolution": {
+                "x": 1920.0,
+                "y": 1200.0
+            },
+            "screens": [
+                {
+                    "name": "Screen_left",
+                    "r": {
+                        "serializedVersion": "2",
+                        "x": 144.0,
+                        "y": 0.0,
+                        "width": 1632.0,
+                        "height": 1200.0
+                    },
+                    "id_display": 0
+                }
+            ],
+            "fullscreen": false
+        },
+        {
+            "name": "Display 1",
+            "resolution": {
+                "x": 1920.0,
+                "y": 1200.0
+            },
+            "screens": [
+                {
+                    "name": "Screen_front",
+                    "r": {
+                        "serializedVersion": "2",
+                        "x": 2064.0,
+                        "y": 0.0,
+                        "width": 1632.0,
+                        "height": 1200.0
+                    },
+                    "id_display": 1
+                }
+            ],
+            "fullscreen": false
+        },
+        {
+            "name": "Display 2",
+            "resolution": {
+                "x": 1920.0,
+                "y": 1200.0
+            },
+            "screens": [
+                {
+                    "name": "Screen_right",
+                    "r": {
+                        "serializedVersion": "2",
+                        "x": 3984.0,
+                        "y": 0.0,
+                        "width": 1632.0,
+                        "height": 1200.0
+                    },
+                    "id_display": 2
+                }
+            ],
+            "fullscreen": false
+        },
+        {
+            "name": "Display 3",
+            "resolution": {
+                "x": 1920.0,
+                "y": 1200.0
+            },
+            "screens": [
+                {
+                    "name": "Screen_floor",
+                    "r": {
+                        "serializedVersion": "2",
+                        "x": 5760.0,
+                        "y": 90.0,
+                        "width": 1920.0,
+                        "height": 1020.0
+                    },
+                    "id_display": 3
+                }
+            ],
+            "fullscreen": false
+        }
+    ],
+    "stereoInvert": true
+}

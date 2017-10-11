@@ -198,12 +198,13 @@ public class StereoObliqueMatrix : MonoBehaviour {
 		#if UNITY_EDITOR
 		cam.projectionMatrix = p;
 		cam.worldToCameraMatrix = rm * tm;
-		#else
-		if (eye == StereoTargetEyeMask.Left) {
+
+#else
+		if (eye == StereoTargetEyeMask.Left &&  VRSettings.enabled) {
 			cam.SetStereoProjectionMatrix (Camera.StereoscopicEye.Left, p);
 			cam.SetStereoViewMatrix (Camera.StereoscopicEye.Left, rm * tm);
 
-		} else if (eye == StereoTargetEyeMask.Right) {
+		} else if (eye == StereoTargetEyeMask.Right && VRSettings.enabled) {
 			cam.SetStereoProjectionMatrix (Camera.StereoscopicEye.Right, p);
 			cam.SetStereoViewMatrix (Camera.StereoscopicEye.Right, rm * tm);
 
@@ -211,6 +212,6 @@ public class StereoObliqueMatrix : MonoBehaviour {
 			cam.projectionMatrix = p;
 			cam.worldToCameraMatrix = rm * tm;
 		}
-		#endif
-	}
+#endif
+    }
 }
