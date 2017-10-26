@@ -48,8 +48,23 @@ public class SummonInterface : MonoBehaviour {
                 }
                 break;
             case eStates.MenuOpened:
+				//the hand is around the chest, but the chest doesn't virtually exist. We use the z-coordinate of the camera.
+			if (IsHandAroundTheChest(closeMargin))
+			{
+				currentState = eStates.HandReadyToClose;
+			}
                 break;
-            case eStates.HandReadyToClose:
+		case eStates.HandReadyToClose:
+			if (handMovement.speed.z > requiredCloseSpeed) 
+			{
+				if (handMovement.speed.x < openMargin && handMovement.speed.y < openMargin)
+				{
+					print("ON A FERME LE MENU OMG!");
+					currentState = eStates.MenuClosed;
+				}
+			
+			}
+				
                 break;
         }
 /*
@@ -78,4 +93,10 @@ public class SummonInterface : MonoBehaviour {
         return transform.position.y > playerHead.transform.position.y - openMargin &&
                     transform.position.y < playerHead.transform.position.y + openMargin;
     }
+	private bool IsHandAroundTheChest (float margin) //la même que head, mais pour préparer la fermeture du menu
+	{
+		return transform.position.z > playerHead.transform.position.z - openMargin &&
+			transform.position.z < playerHead.transform.position.z + openMargin;
+	
+	}
 }
