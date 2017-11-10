@@ -6,7 +6,7 @@ public class SummonInterface : MonoBehaviour {
 
     public Camera playerHead;
     public Transform menu;
-
+	public GameObject app_menu;
 	public float requiredOpenSpeed = 0.1f;
 	public float openMargin = 0.1f;
 	public float requiredCloseSpeed;
@@ -43,6 +43,7 @@ public class SummonInterface : MonoBehaviour {
                     if (handMovement.speed.x < openMargin && handMovement.speed.z < openMargin)
                     {
                         print("ON A OUVERT LE MENU OMG!");
+						app_menu.SetActive (true); // on affiche le menu.
                         currentState = eStates.MenuOpened;
                     }
                 }
@@ -60,6 +61,7 @@ public class SummonInterface : MonoBehaviour {
 				if (handMovement.speed.x < openMargin && handMovement.speed.y < openMargin)
 				{
 					print("ON A FERME LE MENU OMG!");
+					app_menu.SetActive (false); //on rend le menu invisible.
 					currentState = eStates.MenuClosed;
 				}
 			
