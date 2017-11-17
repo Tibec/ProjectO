@@ -5,10 +5,10 @@ using UnityEngine;
 public class SummonInterface : MonoBehaviour {
 
     public Camera playerHead;
-    public Transform menu;
 	public GameObject app_menu;
-	public float requiredOpenSpeed = 0.1f;
-	public float openMargin = 0.1f;
+	public float requiredOpenSpeed = 2.0f;
+	public float openMargin = 0.2f;
+	public float openMarginBound = 0.5f;
 	public float requiredCloseSpeed;
 	public float closeMargin;
 
@@ -23,11 +23,13 @@ public class SummonInterface : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		handMovement = GetComponent<ComputeRigidBodyMovement> ();
+		currentState = eStates.MenuClosed;
+		app_menu.SetActive (false);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-
+		print (handMovement.speed);
         switch(currentState)
         {
             case eStates.MenuClosed:
@@ -47,11 +49,16 @@ public class SummonInterface : MonoBehaviour {
                         currentState = eStates.MenuOpened;
                     }
                 }
-                break;
+				if (!IsHandAroundTheHead(openMargin))
+				{
+					currentState = eStates.MenuClosed;
+				}               
+			break;
             case eStates.MenuOpened:
 				//the hand is around the chest, but the chest doesn't virtually exist. We use the z-coordinate of the camera.
-			if (IsHandAroundTheChest(closeMargin))
+			if (IsHandAroundTheMenu(closeMargin))
 			{
+				print ("hello");
 				currentState = eStates.HandReadyToClose;
 			}
                 break;
@@ -95,10 +102,10 @@ public class SummonInterface : MonoBehaviour {
         return transform.position.y > playerHead.transform.position.y - openMargin &&
                     transform.position.y < playerHead.transform.position.y + openMargin;
     }
-	private bool IsHandAroundTheChest (float margin) //la même que head, mais pour préparer la fermeture du menu
+	private bool IsHandAroundTheMenu (float margin) //la même que head, mais pour préparer la fermeture du menu
 	{
-		return transform.position.z > playerHead.transform.position.z - openMargin &&
-			transform.position.z < playerHead.transform.position.z + openMargin;
+		return transform.position.z > app_menu.transform.position.z - openMargin &&
+			transform.position.z < app_menu.transform.position.z + openMargin;
 	
 	}
 }
