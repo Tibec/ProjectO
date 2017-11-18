@@ -2,110 +2,105 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SummonInterface : MonoBehaviour {
+public class SummonInterface : MonoBehaviour
+{
+    public GameObject app_menu;
 
-    public Camera playerHead;
-	public GameObject app_menu;
-	public float requiredOpenSpeed = 2.0f;
-	public float openMargin = 0.2f;
-	public float openMarginBound = 0.5f;
-	public float requiredCloseSpeed;
-	public float closeMargin;
+    // Opening settings
+    public int openingTimer;
+    //  public Collider OpeningStartCollideBox;
+    //  public Collider OpeningEndCollideBox;
 
-    ComputeRigidBodyMovement handMovement;
+    // Closing setting
+    public int closingTimer;
+
+    // public Collider CloseingStartCollideBox;
+    // public Collider CloseingEndCollideBox;
+
+    private int remainingTime;
 
     // Detection Machine State
     public enum eStates { MenuClosed, HandReadyToOpen, MenuOpened, HandReadyToClose };
     public eStates currentState;
 
+    private bool startOpening, endOpening, startClosing, endClosing;
 
 
-	// Use this for initialization
-	void Start () {
-		handMovement = GetComponent<ComputeRigidBodyMovement> ();
-		currentState = eStates.MenuClosed;
-		app_menu.SetActive (false);
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		print (handMovement.speed);
-        switch(currentState)
+    // Use this for initialization
+    void Start()
+    {
+        currentState = eStates.MenuClosed;
+        app_menu.SetActive(false);
+        startOpening = endOpening = startClosing = endClosing = false;
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+        switch (currentState)
         {
             case eStates.MenuClosed:
-                // the hand is around the head
-                if (IsHandAroundTheHead(openMargin))
+                if(startOpening)
                 {
                     currentState = eStates.HandReadyToOpen;
+                    remainingTime = openingTimer;
                 }
                 break;
             case eStates.HandReadyToOpen:
-                if (handMovement.speed.y >  requiredOpenSpeed)
+                if(endOpening)
                 {
-                    if (handMovement.speed.x < openMargin && handMovement.speed.z < openMargin)
-                    {
-                        print("ON A OUVERT LE MENU OMG!");
-						app_menu.SetActive (true); // on affiche le menu.
-                        currentState = eStates.MenuOpened;
-                    }
+                    currentState = eStates.MenuOpened;
+                    app_menu.SetActive(true);
                 }
-				if (!IsHandAroundTheHead(openMargin))
-				{
-					currentState = eStates.MenuClosed;
-				}               
-			break;
-            case eStates.MenuOpened:
-				//the hand is around the chest, but the chest doesn't virtually exist. We use the z-coordinate of the camera.
-			if (IsHandAroundTheMenu(closeMargin))
-			{
-				print ("hello");
-				currentState = eStates.HandReadyToClose;
-			}
+
+                --remainingTime;
+                if (remainingTime <= 0)
+                    currentState = eStates.MenuClosed;
                 break;
-		case eStates.HandReadyToClose:
-			if (handMovement.speed.z > requiredCloseSpeed) 
-			{
-				if (handMovement.speed.x < openMargin && handMovement.speed.y < openMargin)
-				{
-					print("ON A FERME LE MENU OMG!");
-					app_menu.SetActive (false); //on rend le menu invisible.
-					currentState = eStates.MenuClosed;
-				}
-			
-			}
-				
+            case eStates.MenuOpened:
+                if(startClosing)
+                {
+                    currentState = eStates.HandReadyToClose;
+                    remainingTime = closingTimer;
+                }
+                break;
+            case eStates.HandReadyToClose:
+                if (endClosing)
+                {
+                    currentState = eStates.MenuClosed;
+                    app_menu.SetActive(false);
+                }
+
+                --remainingTime;
+                if (remainingTime <= 0)
+                    currentState = eStates.MenuOpened;
                 break;
         }
-/*
-        // Detection ouverture
-        if (!menuSummoned)
-		{
-			Vector3 lastSpeed = handMovement.speed;
 
-		}
-		else // Detection fermeture
-		{
-			Vector3 lastAccel = handMovement.speed;
-			if (lastAccel.x > requiredCloseSpeed) 
-			{
-				if (lastAccel.y < closeMargin && lastAccel.z < closeMargin)
-				{
-					print ("ON A FERMER LE MENU OMG!");
-				}
-			}
-
-		}*/
-	}
-
-    private bool IsHandAroundTheHead(float margin)
-    {
-        return transform.position.y > playerHead.transform.position.y - openMargin &&
-                    transform.position.y < playerHead.transform.position.y + openMargin;
     }
-	private bool IsHandAroundTheMenu (float margin) //la même que head, mais pour préparer la fermeture du menu
-	{
-		return transform.position.z > app_menu.transform.position.z - openMargin &&
-			transform.position.z < app_menu.transform.position.z + openMargin;
-	
-	}
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.name == "OpenMenuStart")
+            startOpening = true;
+        if (other.name == "OpenMenuEnd")
+            endOpening = true;
+        if (other.name == "CloseMenuStart")
+            startClosing = true;
+        if (other.name == "CloseMenuEnd")
+            endClosing = true;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.name == "OpenMenuStart")
+            startOpening = false;
+        if (other.name == "OpenMenuEnd")
+            endOpening = false;
+        if (other.name == "CloseMenuStart")
+            startClosing = false;
+        if (other.name == "CloseMenuEnd")
+            startClosing = false;
+    }
 }
