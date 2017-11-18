@@ -10,6 +10,8 @@ public class MenuManager : MonoBehaviour {
     public List<MenuEntry> MenuContent;
     public GameObject SubmenuButtonTemplate;
 
+    [Tooltip("Sert a désactiver les interactions pour eviter de faire nawak pendant une tentative de fermeture")]
+    public bool InteractionsEnabled = true;
 
 	// Use this for initialization
 	void Start () {
@@ -18,7 +20,7 @@ public class MenuManager : MonoBehaviour {
 
     private void InitializeSubmenuButtons()
     {
-        Transform submenusButtonContainer = transform.Find("Submenus");
+        Transform submenusButtonContainer = transform.Find("SubmenuButtons");
 
         var children = new List<GameObject>();
         foreach (Transform child in submenusButtonContainer) children.Add(child.gameObject);
@@ -32,6 +34,6 @@ public class MenuManager : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-		
-	}
+
+    }
 }

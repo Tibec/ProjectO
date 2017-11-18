@@ -23,7 +23,7 @@ public class MenuPosition : MonoBehaviour {
 
         transform.position = new Vector3(x, y, z);
         transform.rotation = Quaternion.Euler(
-            PlayerHead.transform.rotation.eulerAngles.x, 
+            transform.rotation.eulerAngles.x, 
             PlayerHead.transform.rotation.eulerAngles.y, 
             0);
 
