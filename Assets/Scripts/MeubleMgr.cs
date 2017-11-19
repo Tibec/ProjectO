@@ -41,6 +41,7 @@ public class MeubleMgr : MonoBehaviour {
             i = maxPage;
 
         LoadMeubles(i * itemSlot.Count);
+        currentPage = i;
     }
 
     private void LoadMeubles(int offset)
@@ -56,6 +57,7 @@ public class MeubleMgr : MonoBehaviour {
             for (int i = 0; i < itemSlot.Count && i+offset < meubles.Count; ++i)
             {
                 GameObject go = Instantiate(itemTemplate, transform.Find("Items"));
+                go.name = (i + offset).ToString();
                 MeubleEntry m = go.GetComponent<MeubleEntry>();
                 //m.SetData(meubles[offset+i]);
                 go.transform.localPosition = itemSlot[i];
@@ -72,6 +74,10 @@ public class MeubleMgr : MonoBehaviour {
         else if (btn.name == "PrevBtn")
         {
             LoadMeublePage(currentPage - 1);
+        }
+        else
+        {
+            int.Parse(btn.name);
         }
     }
 }
