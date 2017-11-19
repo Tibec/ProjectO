@@ -6,6 +6,7 @@ using UnityEngine;
 public class MenuButton : MonoBehaviour {
 
     MenuManager mgr;
+    public GameObject eventHandler;
 
 	// Use this for initialization
 	void Start () {
@@ -23,8 +24,8 @@ public class MenuButton : MonoBehaviour {
     {
         if(other.tag == "Player")
         {
-            if(mgr.InteractionsEnabled)
-                SendMessage("OnButtonClick");
+            if(mgr.InteractionsEnabled && eventHandler != null)
+                eventHandler.SendMessage("OnClick", this);
         }
     }
 }

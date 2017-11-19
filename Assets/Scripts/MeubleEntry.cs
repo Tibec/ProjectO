@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [Serializable]
-public class Meuble : MonoBehaviour {
+public class MeubleEntry : MonoBehaviour {
 
-    public MeubleEntry metadata;
+    public MeubleMetadata metadata;
 
 
     // Use this for initialization
@@ -14,7 +14,7 @@ public class Meuble : MonoBehaviour {
 
     }
 	
-    public void SetData(MeubleEntry _metadata)
+    public void SetData(MeubleMetadata _metadata)
     {
         metadata = _metadata;
 

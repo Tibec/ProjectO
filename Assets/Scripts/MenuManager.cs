@@ -2,32 +2,31 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour {
 
-    [Serializable]
-    public class MenuEntry { public string Name; public GameObject Section; }
-    public List<MenuEntry> MenuContent;
-    public GameObject SubmenuButtonTemplate;
-
     [Tooltip("Sert a désactiver les interactions pour eviter de faire nawak pendant une tentative de fermeture")]
     public bool InteractionsEnabled = true;
+    
+    [Serializable]
+    public class MenubuttonGameobjectPair { public MenuButton Key; public GameObject Value; }
+    public List<MenubuttonGameobjectPair> LinkBetweenButtonAndContent = new List<MenubuttonGameobjectPair>();
 
 	// Use this for initialization
 	void Start () {
-        InitializeSubmenuButtons();
-	}
+        InitializeSubmenus();
 
-    private void InitializeSubmenuButtons()
+    }
+
+    private void InitializeSubmenus()
     {
-        Transform submenusButtonContainer = transform.Find("SubmenuButtons");
-
-        var children = new List<GameObject>();
-        foreach (Transform child in submenusButtonContainer) children.Add(child.gameObject);
-        children.ForEach(child => Destroy(child));
-
-        foreach(var submenu in MenuContent)
+        for(int i=0;i<LinkBetweenButtonAndContent.Count;++i)
         {
+            if (i == 0)
+                LinkBetweenButtonAndContent[i].Value.SetActive(true);
+            else
+                LinkBetweenButtonAndContent[i].Value.SetActive(false);
 
         }
     }
@@ -35,5 +34,16 @@ public class MenuManager : MonoBehaviour {
     // Update is called once per frame
     void Update () {
 
+    }
+
+    void OnClick(MenuButton btn)
+    {
+        foreach(var entry in LinkBetweenButtonAndContent)
+        {
+            if(entry.Key == btn)
+                entry.Value.SetActive(true);
+            else
+                entry.Value.SetActive(false);
+        }
     }
 }
