@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class MeubleEntry : MonoBehaviour {
@@ -18,7 +19,7 @@ public class MeubleEntry : MonoBehaviour {
     {
         metadata = _metadata;
 
-        SpriteRenderer previewContainer = transform.Find("Preview").GetComponent<SpriteRenderer>();
+        Image previewContainer = transform.Find("Preview").GetComponent<Image>();
         previewContainer.sprite = _metadata.preview;
     }
 
@@ -27,8 +28,10 @@ public class MeubleEntry : MonoBehaviour {
 		
 	}
 
-    private void OnButtonClick()
+    private void OnClick()
     {
-        print("On veut ajouter un meuble a l'univers");
+        MeubleSpawnMgr g = FindObjectOfType<MeubleSpawnMgr>();
+
+        g.Spawn(metadata);
     }
 }

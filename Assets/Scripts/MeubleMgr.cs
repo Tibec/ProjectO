@@ -7,8 +7,11 @@ using UnityEngine;
 public class MeubleMetadata
 {
     public string displayName;
-    public GameObject Object;
-    public int initialScale;
+    public GameObject meubleObject;
+    public float initialScale;
+    public float minScale;
+    public float maxScale;
+    public Vector3 menuPosition;
     public Sprite preview;
 }
 
@@ -59,7 +62,7 @@ public class MeubleMgr : MonoBehaviour {
                 GameObject go = Instantiate(itemTemplate, transform.Find("Items"));
                 go.name = (i + offset).ToString();
                 MeubleEntry m = go.GetComponent<MeubleEntry>();
-                //m.SetData(meubles[offset+i]);
+                m.SetData(meubles[offset+i]);
                 go.transform.localPosition = itemSlot[i];
             }
         }

@@ -24,8 +24,10 @@ public class MenuButton : MonoBehaviour {
     {
         if(other.tag == "Player")
         {
-            if(mgr.InteractionsEnabled && eventHandler != null)
+            if (mgr.InteractionsEnabled && eventHandler != null)
                 eventHandler.SendMessage("OnClick", this);
+            if (mgr.InteractionsEnabled && eventHandler == null)
+                SendMessage("OnClick", this);
         }
     }
 }

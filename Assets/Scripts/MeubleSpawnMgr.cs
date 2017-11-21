@@ -1,0 +1,42 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class MeubleSpawnMgr : MonoBehaviour {
+
+    public GameObject meubleContainer;
+    public Transform playerHead;
+    public float spawnDistance;
+    public GameObject meubleMenuPrefab;
+    // Use this for initialization
+    void Start () {
+		
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		
+	}
+
+    public void Spawn(MeubleMetadata metadata)
+    {
+        float r = playerHead.transform.rotation.eulerAngles.y * Mathf.PI / 180.0f;
+        Vector3 frontPlayer = new Vector3();
+
+        frontPlayer.x = playerHead.transform.position.x + (spawnDistance * Mathf.Sin(r));
+        frontPlayer.y = playerHead.transform.position.y + 10;
+        frontPlayer.z = playerHead.transform.position.z + (spawnDistance * Mathf.Cos(r));
+
+        GameObject newGo = Instantiate(meubleContainer, frontPlayer, Quaternion.Euler(0,0,0));
+        GameObject newMeuble = Instantiate(metadata.meubleObject, newGo.transform.Find("Object"));
+        newGo.transform.Find("Object").transform.localScale = Vector3.one * metadata.initialScale;
+        newGo.transform.Find("Object").Find("MenuSpawn").transform.position = metadata.menuPosition;
+        MeubleInteraction mi = newGo.AddComponent<MeubleInteraction>();
+        mi.minScale = metadata.minScale;
+        mi.maxScale = metadata.maxScale;
+        mi.meubleMenuPrefab = meubleMenuPrefab;
+        CollisionListener cl = newMeuble.AddComponent<CollisionListener>();
+        cl.listener = newGo;
+    }
+}

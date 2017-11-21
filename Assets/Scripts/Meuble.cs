@@ -7,8 +7,8 @@ public class Meuble : MonoBehaviour {
 
     private bool free;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
 		
 	}
 	
@@ -26,5 +26,11 @@ public class Meuble : MonoBehaviour {
         free = _free;
     }
 
-   // void OnTouch
+    public void SetState(GameObject _prefab)
+    {
+        
+    }
+
+
+    // void OnTouch
 }
