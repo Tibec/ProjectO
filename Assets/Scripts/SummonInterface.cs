@@ -52,6 +52,7 @@ public class SummonInterface : MonoBehaviour
                 {
                     currentState = eStates.MenuOpened;
                     app_menu.SetActive(true);
+					app_menu.GetComponent<MenuPosition> ().Teleport ();
                 }
 
                 --remainingTime;

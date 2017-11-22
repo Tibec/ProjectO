@@ -17,16 +17,35 @@ public class MenuPosition : MonoBehaviour {
 
 
 	}
+
+	public void Teleport()
+	{
+		transform.position = ComputeDestination ();
+		transform.rotation = Quaternion.Euler(
+			
+			new Vector3(
+				transform.rotation.eulerAngles.x,
+				PlayerHead.transform.rotation.eulerAngles.y,
+				0)
+		);
+	}
+
+	private Vector3 ComputeDestination()
+	{
+		float r = PlayerHead.transform.rotation.eulerAngles.y * Mathf.PI / 180.0f;
+		Vector3 newPosition = new Vector3();
 	
+		newPosition.x = PlayerHead.transform.position.x + (Offset.x * Mathf.Sin(r));
+		newPosition.y = PlayerHead.transform.position.y + Offset.y;
+		newPosition.z = PlayerHead.transform.position.z + (Offset.x * Mathf.Cos(r));
+	
+		return newPosition;
+	}
+
 	// Update is called once per frame
 	void Update () {
          
-        float r = PlayerHead.transform.rotation.eulerAngles.y * Mathf.PI / 180.0f;
-        Vector3 newPosition = new Vector3();
-
-        newPosition.x = PlayerHead.transform.position.x + (Offset.x * Mathf.Sin(r));
-        newPosition.y = PlayerHead.transform.position.y + Offset.y;
-        newPosition.z = PlayerHead.transform.position.z + (Offset.x * Mathf.Cos(r));
+		Vector3 newPosition = ComputeDestination ();
 
         // should we move ?
         if (Vector3.Distance(transform.position, newPosition) > distanceBeforeMovement && !timerActive)
