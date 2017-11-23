@@ -17,14 +17,16 @@ public class SummonInterface : MonoBehaviour
     // public Collider CloseingStartCollideBox;
     // public Collider CloseingEndCollideBox;
 
-    private int remainingTime;
+    public int remainingTime;
 
     // Detection Machine State
     public enum eStates { MenuClosed, HandReadyToOpen, MenuOpened, HandReadyToClose };
     public eStates currentState;
 
-    private bool startOpening, endOpening, startClosing, endClosing;
+    public bool startOpening, endOpening, startClosing, endClosing;
 
+	int openTry = 0;
+	int closeTry = 0;
 
     // Use this for initialization
     void Start()
@@ -34,48 +36,71 @@ public class SummonInterface : MonoBehaviour
         startOpening = endOpening = startClosing = endClosing = false;
     }
 
-    // Update is called once per frame
-    void Update()
+	void FixedUpdate()
     {
+		--remainingTime;
+
+		print ("Etat automate : "+ currentState);
+		print ("Etat menu : "+ app_menu.activeInHierarchy);
 
         switch (currentState)
         {
-            case eStates.MenuClosed:
+			case eStates.MenuClosed:
+				if (app_menu.activeInHierarchy == true) {
+					app_menu.SetActive (false);
+				}
+
                 if(startOpening)
                 {
                     currentState = eStates.HandReadyToOpen;
                     remainingTime = openingTimer;
+					++openTry;
+					print ("Tentative d'ouverture n°"+openTry);
                 }
                 break;
-            case eStates.HandReadyToOpen:
-                if(endOpening)
-                {
-                    currentState = eStates.MenuOpened;
-                    app_menu.SetActive(true);
-					app_menu.GetComponent<MenuPosition> ().Teleport ();
-                }
+			case eStates.HandReadyToOpen:
+				if (endOpening) {
+					currentState = eStates.MenuOpened;
+					print ("Tentative d'ouverture n°" + openTry + " réussie");
+					break;
+				}
 
-                --remainingTime;
-                if (remainingTime <= 0)
-                    currentState = eStates.MenuClosed;
+				if (remainingTime <= 0) {
+					currentState = eStates.MenuClosed;
+					print ("Tentative d'ouverture n°" + openTry + " avortée");
+
+				}
                 break;
-            case eStates.MenuOpened:
+			case eStates.MenuOpened:
+				if (app_menu.activeInHierarchy == false) {
+					app_menu.SetActive (true);
+					app_menu.GetComponent<MenuPosition> ().Teleport ();
+
+				}
+
                 if(startClosing)
                 {
                     currentState = eStates.HandReadyToClose;
                     remainingTime = closingTimer;
-                }
+					++closeTry;
+					print ("Tentative de fermeture n°"+closeTry+"");
+				}
                 break;
-            case eStates.HandReadyToClose:
-                if (endClosing)
-                {
-                    currentState = eStates.MenuClosed;
-                    app_menu.SetActive(false);
-                }
+			case eStates.HandReadyToClose:
+				if (endClosing) {
+					currentState = eStates.MenuClosed;
 
-                --remainingTime;
-                if (remainingTime <= 0)
-                    currentState = eStates.MenuOpened;
+					print ("Tentative de fermeture n°" + closeTry + " réussie");
+					break;
+
+				}
+
+				if (remainingTime <= 0) {
+					currentState = eStates.MenuOpened;
+					print ("Tentative de fermeture n°" + closeTry + " avortée");
+						
+				}
+
                 break;
         }
 

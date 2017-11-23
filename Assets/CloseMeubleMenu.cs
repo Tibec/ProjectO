@@ -20,6 +20,7 @@ public class CloseMeubleMenu : MonoBehaviour {
     {
         if (emitterName == "closeMenu")
         {
+			transform.parent.GetComponent<MeubleInteraction> ().menuOpen = false;
             Destroy(this.gameObject);
         }
     }

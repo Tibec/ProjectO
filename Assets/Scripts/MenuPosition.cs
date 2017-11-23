@@ -67,14 +67,14 @@ public class MenuPosition : MonoBehaviour {
         if (canMove && Vector3.Distance(transform.position, newPosition) > 0.1f)
         {
             transform.position = Vector3.Lerp(transform.position, newPosition, 0.03f);
-            transform.rotation = Quaternion.Euler(Vector3.Lerp(
-                transform.rotation.eulerAngles,
+            transform.rotation = Quaternion.Euler(/*Vector3.Lerp(
+                transform.rotation.eulerAngles,*/
                 new Vector3(
                     transform.rotation.eulerAngles.x,
                     PlayerHead.transform.rotation.eulerAngles.y,
-                    0),
+                    0)/*,
                 0.05f
-                )
+                )*/
             );
         }
         else if (canMove)

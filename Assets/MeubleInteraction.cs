@@ -9,6 +9,8 @@ public class MeubleInteraction : MonoBehaviour {
 
     public GameObject meubleMenuPrefab;
 
+	public bool menuOpen = false;
+
     // Use this for initialization
     void Start () {
 		
@@ -21,7 +23,8 @@ public class MeubleInteraction : MonoBehaviour {
 
     void OnRemoteCollisionEnter(CollisionListenerData data)
     {
-        Instantiate(meubleMenuPrefab, transform.Find("MenuSpawn"));
+		if(! menuOpen)	
+        	Instantiate(meubleMenuPrefab, transform.Find("MenuSpawn"));
     }
 
     void OnRemoteCollisionExit(CollisionListenerData data)
