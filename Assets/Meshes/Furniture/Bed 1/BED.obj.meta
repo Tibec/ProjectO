@@ -102,6 +102,25 @@ ModelImporter:
     4300032: Bed_mattress
     4300034: Bed_Side_Cube
     4300036: Bed_Side_Cube_2
+    6400000: Bed__1_Cube3
+    6400002: Bed__1_Cube_12
+    6400004: Bed__1_Cube_22
+    6400006: Bed__1_Cube_32
+    6400008: Bed___Cube2
+    6400010: Bed___Cube_11
+    6400012: Bed___Cube_21
+    6400014: Bed___Cube_3
+    6400016: Bed_lath_Cube1
+    6400018: Bed_lath_Cube_1
+    6400020: Bed_lath_Cube_23
+    6400022: Bed_lath_Cube_31
+    6400024: Bed_lath_Cube_4
+    6400026: Bed_lath_Cube_5
+    6400028: Bed_lath_Cube_6
+    6400030: Bed_lath_Cube_7
+    6400032: Bed_mattress
+    6400034: Bed_Side_Cube
+    6400036: Bed_Side_Cube_2
   materials:
     importMaterials: 1
     materialName: 0
@@ -130,7 +149,7 @@ ModelImporter:
     lODScreenPercentages: []
     globalScale: 0.001
     meshCompression: 0
-    addColliders: 0
+    addColliders: 1
     importBlendShapes: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
