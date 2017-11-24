@@ -2,7 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-class CollisionListenerData { public GameObject sender { get; set; } public Collider collision { get; set; } }
+class CollisionListenerData {
+    public GameObject sender { get; set; }
+    public Collider collision { get; set; }
+    public Vector3 contactPoint;
+}
 
 public class CollisionListener : MonoBehaviour
 {
@@ -23,12 +27,30 @@ public class CollisionListener : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        listener.SendMessage("OnRemoteCollisionEnter", new CollisionListenerData { sender = gameObject, collision = other });
+        // since ontriggerenter does not give the contact point
+        // we need to compute it ...
+        Vector3 direction = (other.transform.position - transform.position);
+        Vector3 contactPoint = transform.position + direction;
+
+        listener.SendMessage("OnRemoteCollisionEnter", 
+            new CollisionListenerData
+            {
+                sender = gameObject,
+                collision = other,
+                contactPoint = contactPoint
+
+            });
     }
 
     private void OnCollisionEnter(Collision other)
     {
-        listener.SendMessage("OnRemoteCollisionEnter", new CollisionListenerData { sender = gameObject, collision = other.collider });
+        listener.SendMessage("OnRemoteCollisionEnter", 
+            new CollisionListenerData
+            {
+                sender = gameObject,
+                collision = other.collider,
+                contactPoint = other.contacts[0].point
+            });
     }
     private void OnTriggerExit(Collider other)
     {

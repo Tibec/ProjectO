@@ -7,13 +7,13 @@ public class MenuPosition : MonoBehaviour {
 	public GameObject PlayerHead;
 	public Vector2 Offset;
 
-    public float delayBeforeMovement = 30;
     public float distanceBeforeMovement = 0.5f;
-    private bool timerActive = false;
-    private float timer = 0;
-    private bool canMove = false;
-	// Use this for initialization
-	void Start () {
+    public float angleBeforeRotation = 60f;
+
+    private bool moving = false;
+    private bool rotating = false;
+    // Use this for initialization
+    void Start () {
 
 
 	}
@@ -48,36 +48,32 @@ public class MenuPosition : MonoBehaviour {
 		Vector3 newPosition = ComputeDestination ();
 
         // should we move ?
-        if (Vector3.Distance(transform.position, newPosition) > distanceBeforeMovement && !timerActive)
-        {
-            // Start the timer
-            timer = delayBeforeMovement;
-            timerActive = true;
-        }
+        if (Vector3.Distance(transform.position, newPosition) > distanceBeforeMovement && !moving)
+            moving = true;
+
+        // should we rotate ?
+        if (Mathf.DeltaAngle(PlayerHead.transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.y) > angleBeforeRotation && !rotating)
+            rotating = true;
 
 
-        if (timer < 0 && timerActive)
-        {
-            canMove = true;
-            timerActive = false;
-        }
-        else
-            --timer;
 
-        if (canMove && Vector3.Distance(transform.position, newPosition) > 0.1f)
+        if (moving && Vector3.Distance(transform.position, newPosition) > 0.01f)
         {
             transform.position = Vector3.Lerp(transform.position, newPosition, 0.03f);
-            transform.rotation = Quaternion.Euler(/*Vector3.Lerp(
-                transform.rotation.eulerAngles,*/
+        }
+        else if (moving)
+            moving = false;
+
+        if (rotating && Mathf.DeltaAngle(PlayerHead.transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.y) > 0.01f)
+        {
+            transform.rotation = Quaternion.Euler(
                 new Vector3(
                     transform.rotation.eulerAngles.x,
                     PlayerHead.transform.rotation.eulerAngles.y,
-                    0)/*,
-                0.05f
-                )*/
+                    0)
             );
         }
-        else if (canMove)
-            canMove = false;
+        else if (rotating)
+            rotating = false;
     }
 }

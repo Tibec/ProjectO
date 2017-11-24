@@ -25,14 +25,16 @@ public class MeubleSpawnMgr : MonoBehaviour {
         Vector3 frontPlayer = new Vector3();
 
         frontPlayer.x = playerHead.transform.position.x + (spawnDistance * Mathf.Sin(r));
-        frontPlayer.y = playerHead.transform.position.y + 10;
+        frontPlayer.y = playerHead.transform.position.y + 1;
         frontPlayer.z = playerHead.transform.position.z + (spawnDistance * Mathf.Cos(r));
 
+        // Instantiating
         GameObject newGo = Instantiate(meubleContainer, frontPlayer, Quaternion.Euler(0,0,0));
         GameObject newMeuble = Instantiate(metadata.meubleObject, newGo.transform.Find("Object"));
         newGo.transform.Find("Object").transform.localScale = Vector3.one * metadata.initialScale;
-        newGo.transform.Find("Object").Find("MenuSpawn").transform.position = metadata.menuPosition;
-        MeubleInteraction mi = newGo.AddComponent<MeubleInteraction>();
+
+        // Adjusting meuble properties
+        MeubleInteraction mi = newGo.GetComponent<MeubleInteraction>();
         mi.minScale = metadata.minScale;
         mi.maxScale = metadata.maxScale;
         mi.meubleMenuPrefab = meubleMenuPrefab;
