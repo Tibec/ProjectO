@@ -57,7 +57,7 @@ public class MeubleMenuMgr : MonoBehaviour {
         else if (btn.name == "TrashBtn")
         {
             transform.parent.GetComponent<MeubleInteraction>().menuOpen = false;
-            Destroy(this.gameObject);
+            Destroy( transform.parent.gameObject);
         }
         else if (btn.name == "LockBtn")
         {

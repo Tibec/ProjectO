@@ -47,7 +47,8 @@ public class SummonInterface : MonoBehaviour
         {
 			case eStates.MenuClosed:
 				if (app_menu.activeInHierarchy == true) {
-					app_menu.SetActive (false);
+                    startClosing = endClosing = false;
+                    app_menu.SetActive (false);
 				}
 
                 if(startOpening)
