@@ -25,8 +25,6 @@ public class SummonInterface : MonoBehaviour
 
     public bool startOpening, endOpening, startClosing, endClosing;
 
-	int openTry = 0;
-	int closeTry = 0;
 
     // Use this for initialization
     void Start()
@@ -40,9 +38,6 @@ public class SummonInterface : MonoBehaviour
     {
 		--remainingTime;
 
-		print ("Etat automate : "+ currentState);
-		print ("Etat menu : "+ app_menu.activeInHierarchy);
-
         switch (currentState)
         {
 			case eStates.MenuClosed:
@@ -55,20 +50,16 @@ public class SummonInterface : MonoBehaviour
                 {
                     currentState = eStates.HandReadyToOpen;
                     remainingTime = openingTimer;
-					++openTry;
-					print ("Tentative d'ouverture n°"+openTry);
                 }
                 break;
 			case eStates.HandReadyToOpen:
 				if (endOpening) {
 					currentState = eStates.MenuOpened;
-					print ("Tentative d'ouverture n°" + openTry + " réussie");
 					break;
 				}
 
 				if (remainingTime <= 0) {
 					currentState = eStates.MenuClosed;
-					print ("Tentative d'ouverture n°" + openTry + " avortée");
 
 				}
                 break;
@@ -83,22 +74,18 @@ public class SummonInterface : MonoBehaviour
                 {
                     currentState = eStates.HandReadyToClose;
                     remainingTime = closingTimer;
-					++closeTry;
-					print ("Tentative de fermeture n°"+closeTry+"");
 				}
                 break;
 			case eStates.HandReadyToClose:
 				if (endClosing) {
 					currentState = eStates.MenuClosed;
 
-					print ("Tentative de fermeture n°" + closeTry + " réussie");
 					break;
 
 				}
 
 				if (remainingTime <= 0) {
 					currentState = eStates.MenuOpened;
-					print ("Tentative de fermeture n°" + closeTry + " avortée");
 						
 				}
 

@@ -46,7 +46,7 @@ public class MenuPosition : MonoBehaviour {
 	void Update () {
          
 		Vector3 newPosition = ComputeDestination ();
-
+        /*
         // should we move ?
         if (Vector3.Distance(transform.position, newPosition) > distanceBeforeMovement && !moving)
             moving = true;
@@ -56,24 +56,27 @@ public class MenuPosition : MonoBehaviour {
             rotating = true;
 
 
-
-        if (moving && Vector3.Distance(transform.position, newPosition) > 0.01f)
+        */
+        if (Vector3.Distance(transform.position, newPosition) > 0.01f)
         {
             transform.position = Vector3.Lerp(transform.position, newPosition, 0.03f);
-        }
+        }/*
         else if (moving)
             moving = false;
 
         if (rotating && Mathf.DeltaAngle(PlayerHead.transform.rotation.eulerAngles.y, transform.rotation.eulerAngles.y) > 0.01f)
         {
-            transform.rotation = Quaternion.Euler(
+        */
+        transform.rotation = Quaternion.Euler(
                 new Vector3(
                     transform.rotation.eulerAngles.x,
                     PlayerHead.transform.rotation.eulerAngles.y,
                     0)
             );
+        /*
         }
         else if (rotating)
             rotating = false;
+        */
     }
 }

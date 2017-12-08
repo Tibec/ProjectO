@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-class CollisionListenerData {
+public class CollisionListenerData {
     public GameObject sender { get; set; }
     public Collider collision { get; set; }
     public Vector3 contactPoint;

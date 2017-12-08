@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 
 using UnityEngine;
+using UnityEngine.Assertions;
 
 [Serializable]
 public class GestureStep
@@ -13,14 +14,17 @@ public class GestureStep
     public float maxDelayToReachNextCollider;
 }
 
+[RequireComponent(typeof(Collider))]
 public class GestureDetection : MonoBehaviour {
 
-    public string name;
+    public string GestureName;
 
     public bool UseGlobalTimer;
     public float GlobalTimer;
+    private Collider StartArea;
+    public Transform StepContainer;
     [SerializeField]
-    public List<GestureStep> GesturePath;
+    public List<GestureDetectionStep> GesturePath;
 
     private int lastTriggerId = -1;
     private float remainingTime = 0;
@@ -30,33 +34,34 @@ public class GestureDetection : MonoBehaviour {
     {
         lastTriggerId = -1;
 
-        foreach (var step in GesturePath)
-        {
-            CollisionListener cl;
-            cl = step.collider.gameObject.AddComponent<CollisionListener>();
-            cl.listener = this.gameObject;
-        }
+        // We don't need it, it be copied to the right position for each attempt;
+        StepContainer.gameObject.SetActive(false);
+
+        Collider[] coll = GetComponents<Collider>();
+        bool containAtLeastOneTrigger = false;
+        foreach (var c in coll)
+            if (c.isTrigger)
+                containAtLeastOneTrigger = true;
+        Assert.IsTrue(containAtLeastOneTrigger, "There is no trigger assigned to the gesture detection called : " + GestureName);
     }
-	
-	// Update is called once per frame
-	void FixedUpdate ()
+
+
+    void FixedUpdate ()
     {
-        if (lastTriggerId == -1)
-            return;
 
-        remainingTime -= Time.fixedDeltaTime;
+    }
 
-        if (remainingTime <= 0)
-            lastTriggerId = -1;
-
+    void OnGestureDetected()
+    {
+        print("bave");
     }
 
     void OnRemoteCollisionEnter(CollisionListenerData data)
-    {
+    {/*
         if (lastTriggerId + 1 > GesturePath.Count)
             return;
 
-        if (data.sender == GesturePath[lastTriggerId + 1].collider.gameObject)
+        if (data.sender == GesturePath[lastTriggerId + 1].gameObject)
         {
             if(data.collision.tag == "Player")
             {
@@ -66,12 +71,42 @@ public class GestureDetection : MonoBehaviour {
                     remainingTime = GlobalTimer;
 
                 if (lastTriggerId == GesturePath.Count - 1)
-                    SendMessage("GestureDetected", name);
+                    SendMessage("GestureDetected");
 
                 if (!UseGlobalTimer)
                     remainingTime = GesturePath[lastTriggerId].maxDelayToReachNextCollider;
             }
+        }*/
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Reset everything that could be in progress;
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.tag != "Player")
+            return;
+
+        /////////////////////////
+        // Start a new attempt //
+        /////////////////////////
+
+        // instantiate attempt
+        Transform attemptTr = Instantiate(StepContainer, other.transform.position, Quaternion.Euler(Vector3.zero), transform);
+        attemptTr.name = "GestureAttempt";
+        GestureDetectionAttempt attempt = attemptTr.gameObject.AddComponent<GestureDetectionAttempt>();
+        attempt.manager = this;
+
+        // set listeners
+        foreach (var step in attemptTr.GetComponentsInChildren<GestureDetectionStep>())
+        {
+            step.attempt = attempt;
         }
+
+        // everything is ready ! start attempt;
+        attemptTr.gameObject.SetActive(true);
     }
 }
 /*
