@@ -13,6 +13,8 @@ public class CloseMenu : MonoBehaviour {
 
     public Transform MenuContent;
 
+    public float SlideBackSpeed;
+
     private Transform activeHand;
     private eState currentState = eState.None;
 
@@ -28,7 +30,7 @@ public class CloseMenu : MonoBehaviour {
     }
 
     // Update is called once per frame
-    void LateUpdate () {
+    void Update () {
 		switch(currentState)
         {
             case eState.None:
@@ -40,8 +42,20 @@ public class CloseMenu : MonoBehaviour {
                 MenuContent.localPosition = ComputeDeplacement(false);
                 break;
             case eState.SlideBack:
-                MenuContent.localPosition = Vector3.zero;
-                currentState = eState.None;
+                if (MenuContent.localPosition.x > 0)
+                {
+                    MenuContent.localPosition += Vector3.left * SlideBackSpeed;
+                    if (MenuContent.localPosition.x <= 0)
+                        currentState = eState.None;
+                }
+                else if (MenuContent.localPosition.x < 0)
+                {
+                    MenuContent.localPosition += Vector3.right * SlideBackSpeed;
+                    if(MenuContent.localPosition.x >= 0)
+                        currentState = eState.None;
+                }
+                else
+                    currentState = eState.None;
                 break;
         }
     }
@@ -49,23 +63,25 @@ public class CloseMenu : MonoBehaviour {
     private Vector3 ComputeDeplacement(bool rightHanded)
     {
         Collider c = rightHanded ? RightStartClose : LeftStartClose;
-        Vector3 mainLocal = c.transform.InverseTransformVector(activeHand.position);
+        Vector3 mainLocal = c.transform.InverseTransformPoint(activeHand.position);
 
-        float xDiff = c.transform.localPosition.x - mainLocal.x;
-        if (xDiff > 0 && rightHanded ) // La main avance depuis la gauche
+        float xDiff = Mathf.Ceil(mainLocal.x);
+        if (xDiff <= 0 && rightHanded  || xDiff >= 0 && !rightHanded)
         {
-            Vector3 pos = transform.localPosition;
-            pos += Vector3.left * xDiff;
+            Vector3 pos = MenuContent.localPosition;
+            pos += Vector3.right * xDiff;
             return pos;
         }
-        else if(xDiff < 0 && !rightHanded) // La main avance depuis la droite
+        else if(xDiff > 0 && rightHanded || xDiff < 0 && !rightHanded) 
         {
-            Vector3 pos = transform.localPosition;
-            pos -= Vector3.right * xDiff;
+            Vector3 pos = MenuContent.localPosition;
+            pos += Vector3.right * xDiff;
+            if (rightHanded && pos.x > 0 || !rightHanded && pos.x < 0)
+                return Vector3.zero;
             return pos;
         }
         else
-            return transform.localPosition;
+            return Vector3.zero;
     }
 
     void OnRemoteCollisionEnter(CollisionListenerData data)
