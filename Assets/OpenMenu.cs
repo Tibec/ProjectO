@@ -5,7 +5,7 @@ using UnityEngine;
 public class OpenMenu : MonoBehaviour {
 
     public GameObject menu;
-
+    
 	// Use this for initialization
 	void Start () {
 		
@@ -18,7 +18,6 @@ public class OpenMenu : MonoBehaviour {
 
     void OnGestureDetected()
     {
-        if(!menu.activeSelf)
-            menu.SetActive(true);
+        FindObjectOfType<HudManager>().AddMenu(menu);
     }
 }

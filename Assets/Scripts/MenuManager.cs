@@ -6,8 +6,6 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour {
 
-    [Tooltip("Sert a désactiver les interactions pour eviter de faire nawak pendant une tentative de fermeture")]
-    public bool InteractionsEnabled = true;
     
     [Serializable]
     public class MenubuttonGameobjectPair { public MenuButton Key; public GameObject Value; }

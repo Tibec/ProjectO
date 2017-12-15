@@ -5,12 +5,12 @@ using UnityEngine;
 
 public class MenuButton : MonoBehaviour {
 
-    MenuManager mgr;
+    MenuData mgr;
     public GameObject eventHandler;
 
 	// Use this for initialization
 	void Start () {
-        mgr = FindObjectOfType<MenuManager>();
+        mgr = GetComponentInParent<MenuData>();
         if (mgr == null)
             Debug.LogError("Impossible de trouver le gestionnaire de menu");
 	}
@@ -24,9 +24,9 @@ public class MenuButton : MonoBehaviour {
     {
         if(other.tag == "Player")
         {
-            if (mgr.InteractionsEnabled && eventHandler != null)
+            if (mgr.Enabled && eventHandler != null)
                 eventHandler.SendMessage("OnClick", this);
-            if (mgr.InteractionsEnabled && eventHandler == null)
+            if (mgr.Enabled && eventHandler == null)
                 SendMessage("OnClick", this);
         }
     }
