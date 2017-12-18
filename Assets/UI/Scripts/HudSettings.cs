@@ -15,18 +15,19 @@ public class HudSettings : MonoBehaviour {
 
     public int MaxMenuWindow;
 
-    // public float RotationMaxSpeed; // degree/s
+    public float hudFollowDeadZoneDistance;
+    public float hudRotationDeadZoneAngle;
+    public float hudMovementPrecision;
+    public float hudRotationPrecision;
+    public float hudMovementLerpCoef;
+    public float hudRotationLerpCoef;
 
     public Transform TargetToFollow;
 
+    public Transform Popup;
 
-    // Use this for initialization
-    void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    public GameObject RotationBar;
+
+    public Transform MenusContainer;
+
 }

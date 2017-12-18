@@ -3,23 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+
 [RequireComponent(typeof(HudSettings))]
 public class HudManager : MonoBehaviour {
-
-    public delegate void PopupCallback(bool ok);
 
     private HudSettings settings;
 
     public List<GameObject> OpenedMenu = new List<GameObject>();
 
-    public GameObject RotationBar;
 
     private int activeWindow;
 
     private bool handleNewMenu;
 
 
-    public Transform MenusContainer;
     public GameObject ToBeOpened;
     public bool openingInProgress;
 
@@ -28,22 +26,38 @@ public class HudManager : MonoBehaviour {
 
     public bool rotateLeft, rotateRight;
 
-    public Queue<GameObject> PopupQueue;
+    public bool isMoving;
+
+    public delegate void PopupCallback(bool ok);
+
+    [Serializable]
+    public class PopupData
+    {
+        public string title;
+        public string content;
+        public bool isQuestion;
+        public PopupCallback callback;
+    }
+
+    public List<PopupData> PopupQueue;
+
 
     // Use this for initialization
     void Start () {
-
-        if (MenusContainer == null)
-            Debug.LogError("MenuContainer not assigned !");
-
         DontDestroyOnLoad(this);
 
         settings = GetComponent<HudSettings>();
 
+        if (settings.MenusContainer == null)
+            Debug.LogError("MenuContainer not assigned !");
+
         OpenedMenu.Clear();
 
-        RotationBar.SetActive(false);
+        settings.RotationBar.SetActive(false);
 
+        activeWindow = -1;
+
+        isMoving = false;
     }
 
     // Update is called once per frame
@@ -53,20 +67,11 @@ public class HudManager : MonoBehaviour {
         if (rotateRight) { Rotate(false); rotateRight = false; }
 
 
-        // Update HUD position
+        // Update Popup position
         if (settings.TargetToFollow != null)
         {
-            transform.position = settings.TargetToFollow.position + Vector3.up * settings.HudHeight;
-
-            if (OpenedMenu.Count == 1)
-            {
-                transform.localEulerAngles = Vector3.up * settings.TargetToFollow.localEulerAngles.y;
-            }
-            else if (OpenedMenu.Count > 1)
-            {
-                RotationBar.transform.localPosition = ComputeRotationBarPosition();
-                RotationBar.transform.localRotation = ComputeRotationBarRotation();
-            }
+            settings.Popup.localPosition = ComputePopupPosition();
+            settings.Popup.localRotation = ComputeRotationBarRotation();
         }
 
         // update window distance if settings have been changed
@@ -84,6 +89,10 @@ public class HudManager : MonoBehaviour {
         {
             openingInProgress = true;
 
+            AudioSource audio = GetComponent<AudioSource>();
+            if (audio != null)
+                audio.Play();
+
             ToBeOpened = Instantiate(ToBeOpened, transform);
             ToBeOpened.SetActive(true);
             OpenedMenu.Add(ToBeOpened);
@@ -91,11 +100,11 @@ public class HudManager : MonoBehaviour {
             ToBeOpened.transform.localRotation = Quaternion.Euler(settings.MenuInclinaison, 0, 0);
             Action after = () =>
             {
-                ToBeOpened.transform.parent = MenusContainer;
+                ToBeOpened.transform.parent = settings.MenusContainer;
                 ToBeOpened = null;
                 openingInProgress = false;
                 if (OpenedMenu.Count >= 2)
-                    RotationBar.SetActive(true);
+                    settings.RotationBar.SetActive(true);
                 activeWindow = OpenedMenu.Count - 1; 
             };
 
@@ -105,21 +114,30 @@ public class HudManager : MonoBehaviour {
                 StartCoroutine(CoroutineWithCallback(RotateLeft(), after));
         }
 
+        if(!settings.Popup.gameObject.activeSelf && PopupQueue.Count > 0)
+        {
+            settings.Popup.gameObject.SetActive(true);
+
+            PopupData d = PopupQueue[0];
+            settings.Popup.GetComponent<PopupContent>().SetContent(d.title, d.content, d.isQuestion, d.callback);
+            PopupQueue.RemoveAt(0);
+        }
+
     }
 
 
     #region Public API 
     public void AddMenu(GameObject prefab)
     {
-        if (OpenedMenu.Count == settings.MaxMenuWindow)
-        {
-            print("Tried to open a menu, but too many already opened");
-            return;
-        }
-
         if (ToBeOpened != null)
         {
             print("Tried to open a menu, but an other one is still being opened : " + ToBeOpened.name);
+            return;
+        }
+
+        if (OpenedMenu.Count == settings.MaxMenuWindow)
+        {
+            print("Tried to open a menu, but too many already opened");
             return;
         }
 
@@ -132,14 +150,27 @@ public class HudManager : MonoBehaviour {
 
     }
 
-    public bool PopupConfirm(string content, bool warning, PopupCallback callback)
+    public void PopupConfirm(string title, string content, bool warning, PopupCallback callback)
     {
-        return true;
+        PopupData p = new PopupData
+        {
+            title = title,
+            content = content,
+            isQuestion = true,
+            callback = callback
+        };
+        PopupQueue.Add(p);
     }
 
-    public void PopupInfo(string content)
+    public void PopupInfo(string title, string content)
     {
-
+        PopupData p = new PopupData
+        {
+            title = title,
+            content = content,
+            isQuestion = false,
+        };
+        PopupQueue.Add(p);
     }
     #endregion
 
@@ -170,6 +201,15 @@ public class HudManager : MonoBehaviour {
         return v;
     }
 
+    private Vector3 ComputePopupPosition()
+    {
+        Vector3 v = new Vector3();
+        float angle = settings.TargetToFollow.rotation.eulerAngles.y * Mathf.PI / 180.0f;
+        v.x = settings.PopupRadius * Mathf.Sin(angle);
+        v.z = settings.PopupRadius * Mathf.Cos(angle);
+        return v;
+    }
+
     private IEnumerator RotateTo(float angle)
     {
         yield break;
@@ -177,7 +217,7 @@ public class HudManager : MonoBehaviour {
 
     private IEnumerator RotateLeft()
     {
-        float origin = MenusContainer.localEulerAngles.y;
+        float origin = settings.MenusContainer.localEulerAngles.y;
         if(Mathf.Round(origin) % (360f / settings.MaxMenuWindow) != 0)
         {
             print("a rotation is already running");
@@ -185,29 +225,29 @@ public class HudManager : MonoBehaviour {
         }
 
         float goal = origin - (360f / settings.MaxMenuWindow);
-        while (Mathf.Abs(Mathf.DeltaAngle(MenusContainer.localEulerAngles.y,  goal)) > 1f)
+        while (Mathf.Abs(Mathf.DeltaAngle(settings.MenusContainer.localEulerAngles.y,  goal)) > 1f)
         {
-            MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(MenusContainer.localEulerAngles.y, goal, 0.1f), 0);
+            settings.MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(settings.MenusContainer.localEulerAngles.y, goal, 0.1f), 0);
             yield return new WaitForEndOfFrame();
         }
-        MenusContainer.localEulerAngles = new Vector3(0, goal, 0);
+        settings.MenusContainer.localEulerAngles = new Vector3(0, goal, 0);
     }
 
     private IEnumerator RotateRight()
     {
-        float origin = MenusContainer.localEulerAngles.y;
+        float origin = settings.MenusContainer.localEulerAngles.y;
         if (Mathf.Round(origin) % (360f / settings.MaxMenuWindow) != 0)
         {
             print("a rotation is already running");
             yield break;
         }
         float goal = origin + (360f / settings.MaxMenuWindow);
-        while (Mathf.Abs(Mathf.DeltaAngle(MenusContainer.localEulerAngles.y, goal)) > 1f)
+        while (Mathf.Abs(Mathf.DeltaAngle(settings.MenusContainer.localEulerAngles.y, goal)) > 1f)
         {
-            MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(MenusContainer.localEulerAngles.y, goal, 0.1f), 0);
+            settings.MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(settings.MenusContainer.localEulerAngles.y, goal, 0.1f), 0);
             yield return new WaitForEndOfFrame();
         }
-        MenusContainer.localEulerAngles = new Vector3(0, goal, 0);
+        settings.MenusContainer.localEulerAngles = new Vector3(0, goal, 0);
     }
 
     IEnumerator CoroutineWithCallback(IEnumerator doFirst, Action doLast)
