@@ -25,8 +25,14 @@ public class MeubleInteraction : MonoBehaviour {
     {
         if (!menuOpen && data.collision.tag == "Player") 
         {
-            GameObject menu = Instantiate(meubleMenuPrefab, transform);
+            HudManager hud = FindObjectOfType<HudManager>();
+            meubleMenuPrefab.GetComponent<MeubleMenuMgr>().assignedFurniture = transform;
+            hud.AddMenu(meubleMenuPrefab);
+
             menuOpen = true;
+
+            /*
+            GameObject menu = Instantiate(meubleMenuPrefab, transform);
             //menu.transform = data.
 
             Vector3 spawn = data.contactPoint;
@@ -35,6 +41,7 @@ public class MeubleInteraction : MonoBehaviour {
 
             menu.GetComponent<MeubleMenuPosition>().attachPoint = data.contactPoint - data.sender.transform.position;
             menu.GetComponent<MeubleMenuPosition>().attachedObject = data.sender.transform;
+            */
         }
     }
 

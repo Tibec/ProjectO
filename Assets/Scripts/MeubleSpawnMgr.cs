@@ -11,7 +11,7 @@ public class MeubleSpawnMgr : MonoBehaviour {
     public GameObject meubleMenuPrefab;
     // Use this for initialization
     void Start () {
-		
+        DontDestroyOnLoad(this);
 	}
 	
 	// Update is called once per frame
@@ -40,5 +40,8 @@ public class MeubleSpawnMgr : MonoBehaviour {
         mi.meubleMenuPrefab = meubleMenuPrefab;
         CollisionListener cl = newMeuble.AddComponent<CollisionListener>();
         cl.listener = newGo;
+
+        // Setting as child
+        newGo.transform.parent = transform;
     }
 }

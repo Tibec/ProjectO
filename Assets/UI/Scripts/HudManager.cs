@@ -28,6 +28,8 @@ public class HudManager : MonoBehaviour {
 
     public bool rotateLeft, rotateRight;
 
+    public Queue<GameObject> PopupQueue;
+
     // Use this for initialization
     void Start () {
 
@@ -48,17 +50,17 @@ public class HudManager : MonoBehaviour {
     void Update()
     {
         if (rotateLeft) { Rotate(true); rotateLeft = false; }
-        if (rotateRight) { Rotate(true); rotateRight = false; }
+        if (rotateRight) { Rotate(false); rotateRight = false; }
 
 
         // Update HUD position
         if (settings.TargetToFollow != null)
         {
-            transform.position = settings.TargetToFollow.position;
-            MenusContainer.position = settings.TargetToFollow.position + Vector3.up * settings.HudHeight;
+            transform.position = settings.TargetToFollow.position + Vector3.up * settings.HudHeight;
+
             if (OpenedMenu.Count == 1)
             {
-                transform.rotation = settings.TargetToFollow.rotation;
+                transform.localEulerAngles = Vector3.up * settings.TargetToFollow.localEulerAngles.y;
             }
             else if (OpenedMenu.Count > 1)
             {
@@ -155,7 +157,7 @@ public class HudManager : MonoBehaviour {
 
     private Quaternion ComputeRotationBarRotation()
     {
-        return Quaternion.Euler(0, settings.TargetToFollow.rotation.eulerAngles.y, 0);
+        return Quaternion.Euler(0, settings.TargetToFollow.localRotation.eulerAngles.y, 0);
     }
 
     private Vector3 ComputeMenuPosition(int count)
@@ -202,7 +204,7 @@ public class HudManager : MonoBehaviour {
         float goal = origin + (360f / settings.MaxMenuWindow);
         while (Mathf.Abs(Mathf.DeltaAngle(MenusContainer.localEulerAngles.y, goal)) > 1f)
         {
-            transform.localEulerAngles = new Vector3(0, Mathf.LerpAngle(transform.localEulerAngles.y, goal, 0.1f), 0);
+            MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(MenusContainer.localEulerAngles.y, goal, 0.1f), 0);
             yield return new WaitForEndOfFrame();
         }
         MenusContainer.localEulerAngles = new Vector3(0, goal, 0);

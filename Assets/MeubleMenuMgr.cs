@@ -7,6 +7,8 @@ public class MeubleMenuMgr : MonoBehaviour {
     public int activePanel;
     public List<GameObject> panels;
 
+    public Transform assignedFurniture;
+
     //scaling purpose
     private GameObject targetContainer;
     // movement
@@ -15,7 +17,7 @@ public class MeubleMenuMgr : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        targetContainer = transform.parent.Find("Object").gameObject;
+        targetContainer = assignedFurniture.Find("Object").gameObject;
         target = targetContainer.transform.GetChild(0).gameObject;
         activePanel = GetTargetState() ? 1 : 0 ; 
     }
@@ -56,8 +58,8 @@ public class MeubleMenuMgr : MonoBehaviour {
         }
         else if (btn.name == "TrashBtn")
         {
-            transform.parent.GetComponent<MeubleInteraction>().menuOpen = false;
-            Destroy( transform.parent.gameObject);
+            assignedFurniture.GetComponent<MeubleInteraction>().menuOpen = false;
+            Destroy(assignedFurniture.gameObject);
         }
         else if (btn.name == "LockBtn")
         {
