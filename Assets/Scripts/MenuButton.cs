@@ -20,9 +20,12 @@ public class MenuButton : MonoBehaviour {
     private bool pressed;
     private Graphic[] buttonContent;
 
+    private bool selected;
+
     private Color normalColor = Color.white;
     private Color hoverColor = new Color(0.58f, 0.78f, 1, 1);
     private Color pressedColor = new Color(0.6f, 0.6f, 0.6f, 1);
+    private Color selectedColor = new Color(0.58f, 1, 0.78f, 1);
 
     // Use this for initialization
     void Start () {
@@ -45,7 +48,7 @@ public class MenuButton : MonoBehaviour {
     {
         if (other.tag == "Player")
         {
-            if (!mgr.enabled)
+            if (!mgr.Enabled)
                 return;
             if (hovered != other.gameObject)
             {
@@ -86,7 +89,12 @@ public class MenuButton : MonoBehaviour {
 
     private void UpdateColor()
     {
-        if(pressed)
+        if(selected)
+        {
+            foreach (Graphic g in buttonContent)
+                g.color = selectedColor;
+        }
+        else if(pressed)
         {
             foreach (Graphic g in buttonContent)
                 g.color = pressedColor;
@@ -101,6 +109,12 @@ public class MenuButton : MonoBehaviour {
             foreach (Graphic g in buttonContent)
                 g.color = normalColor;
         }
+    }
+
+    public void SetSelected(bool selected)
+    {
+        this.selected = selected;
+        UpdateColor();
     }
 
     private void PlaySound(bool hover)

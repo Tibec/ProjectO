@@ -2,10 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum CollisionType
+{
+    Solid,
+    Trigger,
+}
+
 public class CollisionListenerData {
     public GameObject sender { get; set; }
     public Collider collision { get; set; }
-    public Vector3 contactPoint;
+    public Vector3 contactPoint { get; set; }
+    public CollisionType type { get; set; }
 }
 
 public class CollisionListener : MonoBehaviour
@@ -37,8 +44,8 @@ public class CollisionListener : MonoBehaviour
             {
                 sender = gameObject,
                 collision = other,
-                contactPoint = contactPoint
-
+                contactPoint = contactPoint,
+                type = CollisionType.Trigger
             });
     }
 
@@ -49,7 +56,8 @@ public class CollisionListener : MonoBehaviour
             {
                 sender = gameObject,
                 collision = other.collider,
-                contactPoint = other.contacts[0].point
+                contactPoint = other.contacts[0].point,
+                type = CollisionType.Trigger
             });
     }
     private void OnTriggerExit(Collider other)

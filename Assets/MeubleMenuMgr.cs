@@ -34,9 +34,10 @@ public class MeubleMenuMgr : MonoBehaviour {
     {
         target.GetComponent<Rigidbody>().isKinematic = !_free;
         target.GetComponent<Rigidbody>().useGravity = _free;
-        foreach (Collider c in target.GetComponents<Collider>()) c.isTrigger = !_free;
+        foreach (Collider c in target.GetComponents<Collider>())
+            c.isTrigger = !_free;
 
-        //free = _free;
+        assignedFurniture.GetComponent<MeubleInteraction>().free = _free;
     }
 
     // return true if free
@@ -68,12 +69,23 @@ public class MeubleMenuMgr : MonoBehaviour {
         }
         else if (btn.name == "PlusBtn")
         {
-            targetContainer.transform.localScale += Vector3.one * 0.1f;
+            targetContainer.transform.localScale = 
+                Vector3.Min(targetContainer.transform.localScale + Vector3.one * 0.1f, 
+                assignedFurniture.GetComponent<MeubleInteraction>().maxScale * Vector3.one
+                );
         }
         else if (btn.name == "MinusBtn")
         {
-            targetContainer.transform.localScale -= Vector3.one * 0.1f;
+            targetContainer.transform.localScale =
+                Vector3.Max(targetContainer.transform.localScale - Vector3.one * 0.1f,
+                assignedFurniture.GetComponent<MeubleInteraction>().minScale * Vector3.one
+                );
         }
+    }
+
+    private void OnDestroy()
+    {
+        assignedFurniture.GetComponent<MeubleInteraction>().menuOpen = false;
     }
 
 }

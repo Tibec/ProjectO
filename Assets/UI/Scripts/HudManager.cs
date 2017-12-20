@@ -16,6 +16,7 @@ public class HudManager : MonoBehaviour {
     private int activeWindow;
 
     private bool handleNewMenu;
+    private bool recomputeMenu;
 
 
     public GameObject ToBeOpened;
@@ -75,13 +76,14 @@ public class HudManager : MonoBehaviour {
         }
 
         // update window distance if settings have been changed
-        if( currentMenuRadius != settings.MenuRadius  )
+        if( currentMenuRadius != settings.MenuRadius || recomputeMenu )
         {
             currentMenuRadius = settings.MenuRadius;
             for(int i = 0;i<OpenedMenu.Count;++i)
             {
                 OpenedMenu[i].transform.localPosition = ComputeMenuPosition(i);
             }
+            recomputeMenu = false;
         }
 
         // Spawn menu if needed
@@ -104,7 +106,10 @@ public class HudManager : MonoBehaviour {
                 ToBeOpened = null;
                 openingInProgress = false;
                 if (OpenedMenu.Count >= 2)
+                {
                     settings.RotationBar.SetActive(true);
+                    settings.RotationBar.transform.localPosition = Vector3.zero;
+                }
                 activeWindow = OpenedMenu.Count - 1; 
             };
 
@@ -114,6 +119,7 @@ public class HudManager : MonoBehaviour {
                 StartCoroutine(CoroutineWithCallback(RotateLeft(), after));
         }
 
+        // spawn popup if needed
         if(!settings.Popup.gameObject.activeSelf && PopupQueue.Count > 0)
         {
             settings.Popup.gameObject.SetActive(true);
@@ -122,6 +128,24 @@ public class HudManager : MonoBehaviour {
             settings.Popup.GetComponent<PopupContent>().SetContent(d.title, d.content, d.isQuestion, d.callback);
             PopupQueue.RemoveAt(0);
         }
+
+        // delete menu if there is a null ptr
+        int index = 0;
+        int deletedCount = OpenedMenu.RemoveAll(item => 
+        {
+            bool ret;
+            if (item == null)
+            {
+                if (index == activeWindow) { StartCoroutine(RotateRight()); }
+                ret =  true;
+            }
+            else
+                ret = false;
+            ++index;
+            return ret;
+        });
+        if (deletedCount > 0)
+            recomputeMenu = true;
 
     }
 
@@ -217,6 +241,7 @@ public class HudManager : MonoBehaviour {
 
     private IEnumerator RotateLeft()
     {
+        activeWindow = (activeWindow + 1) % settings.MaxMenuWindow;
         float origin = settings.MenusContainer.localEulerAngles.y;
         if(Mathf.Round(origin) % (360f / settings.MaxMenuWindow) != 0)
         {
@@ -235,6 +260,7 @@ public class HudManager : MonoBehaviour {
 
     private IEnumerator RotateRight()
     {
+        activeWindow = (activeWindow + settings.MaxMenuWindow - 1) % settings.MaxMenuWindow;
         float origin = settings.MenusContainer.localEulerAngles.y;
         if (Mathf.Round(origin) % (360f / settings.MaxMenuWindow) != 0)
         {

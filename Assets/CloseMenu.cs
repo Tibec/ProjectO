@@ -18,6 +18,8 @@ public class CloseMenu : MonoBehaviour {
     private Transform activeHand;
     private eState currentState = eState.None;
 
+    private MenuData menuData;
+
     // Use this for initialization
     void Start () {
         CollisionListener cl;
@@ -27,21 +29,29 @@ public class CloseMenu : MonoBehaviour {
         cl.listener = this.gameObject;
         cl = EndClose.gameObject.AddComponent<CollisionListener>();
         cl.listener = this.gameObject;
+
+        menuData = GetComponentInChildren<MenuData>();
     }
 
     // Update is called once per frame
     void Update () {
-		switch(currentState)
+        ComputeOpacity();
+
+        switch (currentState)
         {
             case eState.None:
+                menuData.Enabled = true;
                 break;
             case eState.FollowRight:
+                menuData.Enabled = false;
                 MenuContent.localPosition = ComputeDeplacement(true);
                 break;
             case eState.FollowLeft:
+                menuData.Enabled = false;
                 MenuContent.localPosition = ComputeDeplacement(false);
                 break;
             case eState.SlideBack:
+                menuData.Enabled = false;
                 if (MenuContent.localPosition.x > 0)
                 {
                     MenuContent.localPosition += Vector3.left * SlideBackSpeed;
@@ -57,6 +67,22 @@ public class CloseMenu : MonoBehaviour {
                 else
                     currentState = eState.None;
                 break;
+        }
+    }
+
+    private void ComputeOpacity()
+    {
+        CanvasGroup g = MenuContent.GetComponent<CanvasGroup>();
+        if (g == null)
+            return;
+
+        if (currentState == eState.None)
+            g.alpha = 1f;
+        else
+        {
+            float distanceFromOrigin = MenuContent.transform.localPosition.x;
+            float menuSize = RightStartClose.transform.localPosition.x;
+            g.alpha = (menuSize - Mathf.Abs(distanceFromOrigin)) / menuSize;
         }
     }
 
@@ -99,7 +125,8 @@ public class CloseMenu : MonoBehaviour {
         if (data.sender == EndClose.gameObject 
             && (currentState == eState.FollowLeft || currentState == eState.FollowRight))
         {
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
+            Destroy(gameObject);
         }
     }
 

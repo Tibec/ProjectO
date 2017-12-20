@@ -13,10 +13,10 @@ public class HudPosition : MonoBehaviour {
         settings = GetComponent<HudSettings>();
         manager = GetComponent<HudManager>();
         isMoving = false;
-    }
+}
 
-    // Update is called once per frame
-    void Update () {
+// Update is called once per frame
+void Update () {
 
         if (settings.TargetToFollow != null && !isMoving)
         {
@@ -34,6 +34,8 @@ public class HudPosition : MonoBehaviour {
             else if (manager.OpenedMenu.Count > 1)
             {
                 if (Mathf.Abs(Mathf.DeltaAngle(settings.RotationBar.transform.localEulerAngles.y, settings.TargetToFollow.localEulerAngles.y)) >= settings.hudRotationDeadZoneAngle)
+                    isMoving = true;
+                else if (settings.RotationBar.transform.localPosition == Vector3.zero)
                     isMoving = true;
             }
         }
