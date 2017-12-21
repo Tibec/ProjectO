@@ -26,13 +26,13 @@ public class GestureDetection : MonoBehaviour {
     [SerializeField]
     public List<GestureDetectionStep> GesturePath;
 
-    private int lastTriggerId = -1;
-    private float remainingTime = 0;
+    // private int lastTriggerId = -1;
+    // private float remainingTime = 0;
 
 	// Use this for initialization
 	void Start ()
     {
-        lastTriggerId = -1;
+        // lastTriggerId = -1;
 
         // We don't need it, it be copied to the right position for each attempt;
         StepContainer.gameObject.SetActive(false);
