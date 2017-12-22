@@ -35,20 +35,20 @@ public class CloseMenu : MonoBehaviour {
 
     // Update is called once per frame
     void Update () {
-        ComputeOpacity();
-
+    
         switch (currentState)
         {
             case eState.None:
-                menuData.Enabled = true;
                 break;
             case eState.FollowRight:
                 menuData.Enabled = false;
                 MenuContent.localPosition = ComputeDeplacement(true);
+                ComputeOpacity();
                 break;
             case eState.FollowLeft:
                 menuData.Enabled = false;
                 MenuContent.localPosition = ComputeDeplacement(false);
+                ComputeOpacity();
                 break;
             case eState.SlideBack:
                 menuData.Enabled = false;
@@ -56,16 +56,28 @@ public class CloseMenu : MonoBehaviour {
                 {
                     MenuContent.localPosition += Vector3.left * SlideBackSpeed;
                     if (MenuContent.localPosition.x <= 0)
+                    {
+                        menuData.Enabled = true;
                         currentState = eState.None;
+                        ComputeOpacity();
+                    }
                 }
                 else if (MenuContent.localPosition.x < 0)
                 {
                     MenuContent.localPosition += Vector3.right * SlideBackSpeed;
-                    if(MenuContent.localPosition.x >= 0)
+                    if (MenuContent.localPosition.x >= 0)
+                    {
+                        menuData.Enabled = true;
                         currentState = eState.None;
+                        ComputeOpacity();
+                    }
                 }
                 else
+                {
+                    menuData.Enabled = true;
                     currentState = eState.None;
+                    ComputeOpacity();
+                }
                 break;
         }
     }
@@ -112,6 +124,9 @@ public class CloseMenu : MonoBehaviour {
 
     void OnRemoteCollisionEnter(CollisionListenerData data)
     {
+        if (data.collision.tag != "Player")
+            return;
+
         if (data.sender == LeftStartClose.gameObject && currentState == eState.None)
         {
             currentState = eState.FollowLeft;
@@ -132,6 +147,9 @@ public class CloseMenu : MonoBehaviour {
 
     void OnRemoteCollisionExit(CollisionListenerData data)
     {
+        if (data.collision.tag != "Player")
+            return;
+
         if (data.sender == LeftStartClose.gameObject && currentState == eState.FollowLeft)
         {
             currentState = eState.SlideBack;

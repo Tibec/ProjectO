@@ -9,16 +9,9 @@ public class MeubleMenuMgr : MonoBehaviour {
 
     public Transform assignedFurniture;
 
-    //scaling purpose
-    private GameObject targetContainer;
-    // movement
-    private GameObject target;
-
 
     // Use this for initialization
     void Start () {
-        targetContainer = assignedFurniture.Find("Object").gameObject;
-        target = targetContainer.transform.GetChild(0).gameObject;
         activePanel = GetTargetState() ? 1 : 0 ; 
     }
 
@@ -32,9 +25,9 @@ public class MeubleMenuMgr : MonoBehaviour {
 
     public void SetTargetState(bool _free)
     {
-        target.GetComponent<Rigidbody>().isKinematic = !_free;
-        target.GetComponent<Rigidbody>().useGravity = _free;
-        foreach (Collider c in target.GetComponents<Collider>())
+        assignedFurniture.GetComponent<Rigidbody>().isKinematic = !_free;
+        assignedFurniture.GetComponent<Rigidbody>().useGravity = _free;
+        foreach (Collider c in assignedFurniture.GetComponentsInChildren<Collider>())
             c.isTrigger = !_free;
 
         assignedFurniture.GetComponent<MeubleInteraction>().free = _free;
@@ -43,7 +36,7 @@ public class MeubleMenuMgr : MonoBehaviour {
     // return true if free
     public bool GetTargetState()
     {
-        return !target.GetComponent<Rigidbody>().isKinematic;
+        return !assignedFurniture.GetComponent<Rigidbody>().isKinematic;
     }
 
     public void OnClick(MenuButton btn)
@@ -51,16 +44,21 @@ public class MeubleMenuMgr : MonoBehaviour {
         if (btn.name == "MoveBtn")
         {
             SetTargetState(true);
-            activePanel = 0;
+            activePanel = 1;
         }
         else if (btn.name == "ResizeBtn")
         {
             activePanel = 2;
         }
+        else if (btn.name == "BackBtn")
+        {
+            activePanel = 0;
+        }
         else if (btn.name == "TrashBtn")
         {
             assignedFurniture.GetComponent<MeubleInteraction>().menuOpen = false;
             Destroy(assignedFurniture.gameObject);
+            Destroy(gameObject);
         }
         else if (btn.name == "LockBtn")
         {
@@ -69,15 +67,15 @@ public class MeubleMenuMgr : MonoBehaviour {
         }
         else if (btn.name == "PlusBtn")
         {
-            targetContainer.transform.localScale = 
-                Vector3.Min(targetContainer.transform.localScale + Vector3.one * 0.1f, 
+            assignedFurniture.transform.localScale = 
+                Vector3.Min(assignedFurniture.transform.localScale + Vector3.one * 0.1f, 
                 assignedFurniture.GetComponent<MeubleInteraction>().maxScale * Vector3.one
                 );
         }
         else if (btn.name == "MinusBtn")
         {
-            targetContainer.transform.localScale =
-                Vector3.Max(targetContainer.transform.localScale - Vector3.one * 0.1f,
+            assignedFurniture.transform.localScale =
+                Vector3.Max(assignedFurniture.transform.localScale - Vector3.one * 0.1f,
                 assignedFurniture.GetComponent<MeubleInteraction>().minScale * Vector3.one
                 );
         }

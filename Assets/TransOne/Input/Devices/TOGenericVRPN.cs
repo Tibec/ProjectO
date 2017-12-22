@@ -42,14 +42,6 @@ public class TOGenericVRPN : TOInput
         return A_GetAxis(nameButton, id);
     }
 
-    public static Vector3 GetPosition(int id)
-    {
-        return A_GetPosition("", id);
-    }
-
-    public static Quaternion GetRotation(int id)
-    {
-        return A_GetRotation("", id);
-    }
+   
 
 }

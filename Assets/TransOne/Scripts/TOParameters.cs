@@ -123,10 +123,12 @@ static class TOParameters {
 						TOKeyboard.Init<BasicInputWindows> (id, "Keyboard", "");
 
 						break;
-					}
-					TOInputController.UpdateData(id);
 
-				}
+
+					}
+                        TOInputController.UpdateData(id);
+
+                    }
                     break;
 
                 case TOTrackerServerType.Vive:
@@ -139,6 +141,7 @@ static class TOParameters {
                     {
                         int id = trackerParameters.trackerServers[i].trackers[j].id;
                         TOViveCtrl.Init<BasicInputViveStreamer>(id, "", ip2);
+                        TOInputController.UpdateData(id);
                     }
 
                         break;

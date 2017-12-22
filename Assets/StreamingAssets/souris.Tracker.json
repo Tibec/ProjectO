@@ -1,0 +1,18 @@
+{
+    "trackerServers": [
+        {
+            "name": "trackerServer",
+            "type": 1,
+            "ip": "127.0.0.1",
+            "port": 3883,
+            "trackers": [
+                {
+                    "id": 0,
+                    "name": "Mouse0",
+                    "type": 0
+                }
+				
+            ]
+        }
+    ]
+}

@@ -7,6 +7,7 @@ public class SpawnPlayer : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
         GameObject.Find("Player").transform.position = transform.position;
+        GameObject.Find("HandContainer").transform.position = transform.position;
         GameObject.Find("Bulle").transform.position = transform.position;
     }
 

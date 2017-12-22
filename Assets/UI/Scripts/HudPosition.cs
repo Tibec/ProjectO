@@ -13,11 +13,15 @@ public class HudPosition : MonoBehaviour {
         settings = GetComponent<HudSettings>();
         manager = GetComponent<HudManager>();
         isMoving = false;
-}
+    }
 
-// Update is called once per frame
-void Update () {
-
+    // Update is called once per frame
+    void Update ()
+    {
+        if(settings.TargetToFollow == null)
+        {
+            settings.TargetToFollow = FindObjectOfType<TOCAVEController>().transform;
+        }
         if (settings.TargetToFollow != null && !isMoving)
         {
             Vector3 newPosition = settings.TargetToFollow.position + Vector3.up * settings.HudHeight;
@@ -26,12 +30,7 @@ void Update () {
                 isMoving = true;
             }
             
-            if (manager.OpenedMenu.Count == 1)
-            {
-                if (Mathf.Abs(Mathf.DeltaAngle(transform.localEulerAngles.y, settings.TargetToFollow.localEulerAngles.y)) >= settings.hudRotationDeadZoneAngle)
-                    isMoving = true;
-            }
-            else if (manager.OpenedMenu.Count > 1)
+            if (manager.OpenedMenu.Count > 0)
             {
                 if (Mathf.Abs(Mathf.DeltaAngle(settings.RotationBar.transform.localEulerAngles.y, settings.TargetToFollow.localEulerAngles.y)) >= settings.hudRotationDeadZoneAngle)
                     isMoving = true;
@@ -49,12 +48,7 @@ void Update () {
             // compute & move : rotation
             float targetRotation = settings.TargetToFollow.localEulerAngles.y % 360f;
             float newRotation = 0f;
-            if (manager.OpenedMenu.Count == 1)
-            {
-                newRotation = Mathf.LerpAngle(transform.localEulerAngles.y, targetRotation, settings.hudRotationLerpCoef);
-                transform.localEulerAngles = Vector3.up * newRotation;
-            }
-            else if (manager.OpenedMenu.Count > 1)
+            if (manager.OpenedMenu.Count > 0)
             {
                 newRotation = Mathf.LerpAngle(settings.RotationBar.transform.localEulerAngles.y, targetRotation, settings.hudRotationLerpCoef);
                 settings.RotationBar.transform.localEulerAngles = Vector3.up * newRotation;

@@ -5,6 +5,19 @@ using System.Linq;
 using UnityEngine;
 
 
+public enum InputTypes
+{
+    PSInputs,
+    XboxInputs,
+    ValveInputs,
+    WiiInputs,
+    TOAxis,
+    TOButtons,
+    TOTrac,
+    KeyCode,
+    KeyCodeVRPN
+}
+
 /// <summary>
 /// Sony controller inputs
 /// </summary>
@@ -235,6 +248,38 @@ public abstract class TOInput
 
 		return (T)Activator.CreateInstance (typeof(T), new object[]{id,type,idSub});
 	}
+
+
+    public static bool GetButtonDown(IConvertible nameButton, int id)
+    {
+        return A_GetButtonDown(nameButton, id);
+    }
+
+    public static bool GetButtonUp(IConvertible nameButton, int id)
+    {
+        return A_GetButtonUp(nameButton, id);
+    }
+    public static bool GetButton(IConvertible nameButton, int id)
+    {
+        return A_GetButton(nameButton, id);
+    }
+    public static float GetAxis(IConvertible nameButton, int id)
+    {
+        return A_GetAxis(nameButton, id);
+    }
+
+    public static Vector3 GetPosition(int id)
+    {
+        return A_GetPosition("", id);
+    }
+
+    public static Quaternion GetRotation(int id)
+    {
+        return A_GetRotation("", id);
+    }
+
+
+
 
     protected static bool A_GetButtonDown(IConvertible nameButton, int id)
     {

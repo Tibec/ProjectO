@@ -9,9 +9,10 @@ public class MeubleSpawnMgr : MonoBehaviour {
     public Transform playerHead;
     public float spawnDistance;
     public GameObject meubleMenuPrefab;
+
     // Use this for initialization
     void Start () {
-        DontDestroyOnLoad(this);
+        //DontDestroyOnLoad(this);
 	}
 	
 	// Update is called once per frame
@@ -30,16 +31,14 @@ public class MeubleSpawnMgr : MonoBehaviour {
 
         // Instantiating
         GameObject newGo = Instantiate(meubleContainer, frontPlayer, Quaternion.Euler(0,0,0));
-        GameObject newMeuble = Instantiate(metadata.meubleObject, newGo.transform.Find("Object"));
-        newGo.transform.Find("Object").transform.localScale = Vector3.one * metadata.initialScale;
+        GameObject newMeuble = Instantiate(metadata.meubleObject, newGo.transform);
+        newGo.transform.localScale = Vector3.one * metadata.initialScale;
 
         // Adjusting meuble properties
         MeubleInteraction mi = newGo.GetComponent<MeubleInteraction>();
         mi.minScale = metadata.minScale;
         mi.maxScale = metadata.maxScale;
         mi.meubleMenuPrefab = meubleMenuPrefab;
-        CollisionListener cl = newMeuble.AddComponent<CollisionListener>();
-        cl.listener = newGo;
 
         // Setting as child
         newGo.transform.parent = transform;

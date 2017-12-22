@@ -25,6 +25,9 @@ public class TOInputController : MonoBehaviour {
     [NonSerialized]
     public List<Transform> positionTrackers = new List<Transform>();
 
+    public List<TOInteractionInput> interactionInputs = new List<TOInteractionInput>();
+    
+
     void Awake()
     {
         if(Singleton<TOInputController>.CheckSingletonExists(this)) return;
@@ -37,6 +40,10 @@ public class TOInputController : MonoBehaviour {
         else
         {
             TOParameters.InitTrackers();
+            for (int i = 0; i < interactionInputs.Count; i++)
+            {
+                interactionInputs[i].SetType();
+            }
         }
     }
 
@@ -44,8 +51,18 @@ public class TOInputController : MonoBehaviour {
     public static void UpdateData(int id)
     {
 		listInputs.AddRange(TOInput.returnInstance(id));
+
     }
 
+    void Update()
+    {
+        for(int i =0;i< interactionInputs.Count; i++)
+        {
+            interactionInputs[i].CheckInput();
+        }
+
+
+    }
 
     void LateUpdate()
     {
@@ -62,3 +79,7 @@ public class TOInputController : MonoBehaviour {
 	}
 
 }
+
+
+
+

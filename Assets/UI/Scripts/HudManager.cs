@@ -12,9 +12,6 @@ public class HudManager : MonoBehaviour {
 
     public List<GameObject> OpenedMenu = new List<GameObject>();
 
-
-    private int activeWindow;
-
     private bool handleNewMenu;
     private bool recomputeMenu;
 
@@ -26,10 +23,12 @@ public class HudManager : MonoBehaviour {
     private float currentMenuHeight;
 
     public bool rotateLeft, rotateRight;
-
-    public bool isMoving;
+    public float rotateDestination;
+    public bool isRotating;
 
     public delegate void PopupCallback(bool ok);
+
+    private List<Transform> spawnPoints = new List<Transform>();
 
     [Serializable]
     public class PopupData
@@ -45,7 +44,7 @@ public class HudManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        DontDestroyOnLoad(this);
+        // DontDestroyOnLoad(this);
 
         settings = GetComponent<HudSettings>();
 
@@ -56,9 +55,9 @@ public class HudManager : MonoBehaviour {
 
         settings.RotationBar.SetActive(false);
 
-        activeWindow = -1;
+        isRotating = false;
 
-        isMoving = false;
+        ComputeSpawnPoints();
     }
 
     // Update is called once per frame
@@ -76,13 +75,29 @@ public class HudManager : MonoBehaviour {
         }
 
         // update window distance if settings have been changed
-        if( currentMenuRadius != settings.MenuRadius || recomputeMenu )
+        if( currentMenuRadius != settings.MenuRadius )
         {
             currentMenuRadius = settings.MenuRadius;
-            for(int i = 0;i<OpenedMenu.Count;++i)
+            ReComputeSpawnPoints();
+        }
+        if (recomputeMenu )
+        {
+            for(int i = 0;i<spawnPoints.Count;++i)
             {
-                OpenedMenu[i].transform.localPosition = ComputeMenuPosition(i);
+                if (spawnPoints[i].childCount == 0)
+                {
+                    for (int j = i+1; j < spawnPoints.Count; ++j)
+                    {
+                        if (spawnPoints[j].childCount != 0)
+                        {
+                            Transform t = spawnPoints[i];
+                            spawnPoints[i] = spawnPoints[j];
+                            spawnPoints[j] = t;
+                        }
+                    }
+                }
             }
+            StartCoroutine(RecomputeSpawnPoints());
             recomputeMenu = false;
         }
 
@@ -95,28 +110,31 @@ public class HudManager : MonoBehaviour {
             if (audio != null)
                 audio.Play();
 
-            ToBeOpened = Instantiate(ToBeOpened, transform);
+            ToBeOpened = Instantiate(ToBeOpened, spawnPoints[OpenedMenu.Count]);
             ToBeOpened.SetActive(true);
             OpenedMenu.Add(ToBeOpened);
-            ToBeOpened.transform.localPosition = ComputeMenuPosition(0);
             ToBeOpened.transform.localRotation = Quaternion.Euler(settings.MenuInclinaison, 0, 0);
             Action after = () =>
             {
-                ToBeOpened.transform.parent = settings.MenusContainer;
                 ToBeOpened = null;
                 openingInProgress = false;
-                if (OpenedMenu.Count >= 2)
+                if (OpenedMenu.Count >= 1)
                 {
                     settings.RotationBar.SetActive(true);
                     settings.RotationBar.transform.localPosition = Vector3.zero;
                 }
-                activeWindow = OpenedMenu.Count - 1; 
             };
 
             if (OpenedMenu.Count == 1)
+            {
+                settings.MenusContainer.transform.eulerAngles = settings.TargetToFollow.eulerAngles.y * Vector3.up;
                 after();
+            }
             else
-                StartCoroutine(CoroutineWithCallback(RotateLeft(), after));
+            {
+                RotateToMenu(OpenedMenu.Count-1);
+                after();
+            }
         }
 
         // spawn popup if needed
@@ -136,7 +154,7 @@ public class HudManager : MonoBehaviour {
             bool ret;
             if (item == null)
             {
-                if (index == activeWindow) { StartCoroutine(RotateRight()); }
+                if (OpenedMenu.IndexOf(item) == OpenedMenu.Count - 1) { Rotate(false); }
                 ret =  true;
             }
             else
@@ -146,8 +164,13 @@ public class HudManager : MonoBehaviour {
         });
         if (deletedCount > 0)
             recomputeMenu = true;
+        if(OpenedMenu.Count == 0)
+        {
+            settings.RotationBar.gameObject.SetActive(false);
+        }
 
     }
+
 
 
     #region Public API 
@@ -161,6 +184,7 @@ public class HudManager : MonoBehaviour {
 
         if (OpenedMenu.Count == settings.MaxMenuWindow)
         {
+            PopupInfo("Erreur", "Trops de menu sont déjà ouverts ! Veuillez en fermer quelques un !");
             print("Tried to open a menu, but too many already opened");
             return;
         }
@@ -171,7 +195,7 @@ public class HudManager : MonoBehaviour {
 
     public void CloseMenu(int id)
     {
-
+        Destroy(OpenedMenu[id]);
     }
 
     public void PopupConfirm(string title, string content, bool warning, PopupCallback callback)
@@ -215,10 +239,59 @@ public class HudManager : MonoBehaviour {
         return Quaternion.Euler(0, settings.TargetToFollow.localRotation.eulerAngles.y, 0);
     }
 
+    private void ComputeSpawnPoints()
+    {
+        int slot = settings.MaxMenuWindow;
+        for (int i = 0; i < slot; ++i)
+        {
+            Vector3 pos = ComputeMenuPosition(i);
+            float angle = i * (360f / slot);
+            GameObject go = new GameObject(i.ToString());
+            go.transform.parent = settings.MenusContainer.transform;
+            go.transform.localPosition = pos;
+            go.transform.localEulerAngles = angle * Vector3.up;
+            spawnPoints.Add(go.transform);
+        }
+    }
+
+    private void ReComputeSpawnPoints()
+    {
+        int slot = settings.MaxMenuWindow;
+        for (int i = 0; i < slot; ++i)
+        {
+            Vector3 pos = ComputeMenuPosition(i);
+            float angle = i * (360f / slot);
+            spawnPoints[i].gameObject.name = i.ToString();
+            spawnPoints[i].localPosition = pos;
+            spawnPoints[i].localEulerAngles = angle * Vector3.up;
+        }
+    }
+
+    IEnumerator RecomputeSpawnPoints()
+    {
+        int slot = settings.MaxMenuWindow;
+
+        for (int j = 0; j < 120; ++j)
+        {
+            for (int i = 0; i < slot; ++i)
+            {
+                Vector3 pos = ComputeMenuPosition(i);
+                float angle = i * (360f / slot);
+                spawnPoints[i].localPosition = Vector3.Lerp(pos, spawnPoints[i].localPosition, 0.1f);
+                spawnPoints[i].localEulerAngles = angle * Vector3.up;
+            }
+
+            yield return new WaitForEndOfFrame();
+        }
+        ReComputeSpawnPoints();
+    }
+
+
+
     private Vector3 ComputeMenuPosition(int count)
     {
         Vector3 v = new Vector3();
-        float angle = 360f / settings.MaxMenuWindow * count % 180f;
+        float angle = 360f / settings.MaxMenuWindow * count;
         angle = angle * Mathf.PI / 180.0f;
         v.x = settings.MenuRadius * Mathf.Sin(angle);
         v.z = settings.MenuRadius * Mathf.Cos(angle);
@@ -234,47 +307,26 @@ public class HudManager : MonoBehaviour {
         return v;
     }
 
-    private IEnumerator RotateTo(float angle)
+    private IEnumerator RotateTo(float goal)
     {
-        yield break;
-    }
-
-    private IEnumerator RotateLeft()
-    {
-        activeWindow = (activeWindow + 1) % settings.MaxMenuWindow;
-        float origin = settings.MenusContainer.localEulerAngles.y;
-        if(Mathf.Round(origin) % (360f / settings.MaxMenuWindow) != 0)
+        if(isRotating)
         {
             print("a rotation is already running");
             yield break;
         }
 
-        float goal = origin - (360f / settings.MaxMenuWindow);
-        while (Mathf.Abs(Mathf.DeltaAngle(settings.MenusContainer.localEulerAngles.y,  goal)) > 1f)
+        isRotating = true;
+        rotateDestination = goal;
+        while (Mathf.Abs(Mathf.DeltaAngle(settings.MenusContainer.localEulerAngles.y, rotateDestination)) > 1f)
         {
-            settings.MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(settings.MenusContainer.localEulerAngles.y, goal, 0.1f), 0);
+            settings.MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(settings.MenusContainer.localEulerAngles.y, rotateDestination, 0.1f), 0);
             yield return new WaitForEndOfFrame();
         }
-        settings.MenusContainer.localEulerAngles = new Vector3(0, goal, 0);
+        settings.MenusContainer.localEulerAngles = new Vector3(0, rotateDestination, 0);
+
+        isRotating = false;
     }
 
-    private IEnumerator RotateRight()
-    {
-        activeWindow = (activeWindow + settings.MaxMenuWindow - 1) % settings.MaxMenuWindow;
-        float origin = settings.MenusContainer.localEulerAngles.y;
-        if (Mathf.Round(origin) % (360f / settings.MaxMenuWindow) != 0)
-        {
-            print("a rotation is already running");
-            yield break;
-        }
-        float goal = origin + (360f / settings.MaxMenuWindow);
-        while (Mathf.Abs(Mathf.DeltaAngle(settings.MenusContainer.localEulerAngles.y, goal)) > 1f)
-        {
-            settings.MenusContainer.localEulerAngles = new Vector3(0, Mathf.LerpAngle(settings.MenusContainer.localEulerAngles.y, goal, 0.1f), 0);
-            yield return new WaitForEndOfFrame();
-        }
-        settings.MenusContainer.localEulerAngles = new Vector3(0, goal, 0);
-    }
 
     IEnumerator CoroutineWithCallback(IEnumerator doFirst, Action doLast)
     {
@@ -285,23 +337,45 @@ public class HudManager : MonoBehaviour {
     #endregion
     public void Rotate(float angle)
     {
+        throw new NotImplementedException();
+    }
 
+    private void RotateToMenu(int v)
+    {
+        float goal = 0f;
+        float menuAngle = 360f / settings.MaxMenuWindow;
+        float playerAngle = settings.TargetToFollow.eulerAngles.y;
+        goal = playerAngle - v % OpenedMenu.Count * menuAngle;
+        if (!isRotating)
+            StartCoroutine(RotateTo(goal));
+        else
+            rotateDestination = goal;
     }
 
     // rotate to left if true, else right
     public void Rotate(bool left)
     {
-        if (left)
+        float goal = 0f;
+        float menuAngle = 360f / settings.MaxMenuWindow;
+        float playerAngle = settings.TargetToFollow.eulerAngles.y;
+        if (GetComponent<HudActiveWindow>().activeWindow == -1)
         {
-            StartCoroutine(CoroutineWithCallback(RotateLeft(), () => {
-                --activeWindow;
-            }));
+            if (left)
+                goal = playerAngle;
+            else
+                goal = playerAngle - (OpenedMenu.Count - 1) * menuAngle;
         }
         else
         {
-            StartCoroutine(CoroutineWithCallback(RotateRight(), () => {
-                ++activeWindow;
-            }));
+            if (left)
+                goal = playerAngle - (GetComponent<HudActiveWindow>().activeWindow - 1) % OpenedMenu.Count * menuAngle;
+            else
+                goal = playerAngle - (GetComponent<HudActiveWindow>().activeWindow + 1) % OpenedMenu.Count * menuAngle;
         }
+
+        if (!isRotating)
+            StartCoroutine(RotateTo(goal));
+        else
+            rotateDestination = goal;
     }
 }

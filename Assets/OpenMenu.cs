@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class OpenMenu : MonoBehaviour {
 
+
+    public bool open = false;
     public GameObject menu;
     
 	// Use this for initialization
@@ -18,6 +20,8 @@ public class OpenMenu : MonoBehaviour {
 
     void OnGestureDetected()
     {
+        if (FindObjectOfType<MenuManager>() != null)
+            return;
         FindObjectOfType<HudManager>().AddMenu(menu);
     }
 }

@@ -18,6 +18,8 @@ public class BubbleMgr : MonoBehaviour
     public string toLoad;
     public bool load;
 
+    string loadedScene;
+
     void Start(){
 
     }
@@ -28,6 +30,11 @@ public class BubbleMgr : MonoBehaviour
         {
             load = false;
             ChangeScene(toLoad);
+        }
+
+        if(Input.GetKeyDown(KeyCode.A))
+        {
+            ChangeScene("Nature");
         }
 
         if (fadeIn)
@@ -87,9 +94,13 @@ public class BubbleMgr : MonoBehaviour
 
     IEnumerator ChangeScene_Coroutine(string scene)
     {
-        AsyncOperation ao = SceneManager.LoadSceneAsync(scene);
         FadeIn();
-        yield return ao;
+        if(loadedScene !=null)
+        {
+            yield return SceneManager.UnloadSceneAsync(loadedScene);
+        }
+        yield return SceneManager.LoadSceneAsync(scene, LoadSceneMode.Single);
+        loadedScene = scene;
         FadeOut();
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Valve.VR;
 
 [Serializable]
 public class DescriptionVive
@@ -73,7 +74,6 @@ public class SendDataVive : SendData<ViveData> {
 
     IEnumerator UpdateController(int index,uint deviceIndex)
     {
-/*
         var system = OpenVR.System;
         VRControllerState_t controllerState = new VRControllerState_t();
         if (system != null && system.GetControllerState(deviceIndex, ref controllerState, (uint)System.Runtime.InteropServices.Marshal.SizeOf(typeof(VRControllerState_t))))
@@ -133,7 +133,7 @@ public class SendDataVive : SendData<ViveData> {
             controllerData.data[index].padY = controllerState.rAxis0.y;
 
         }
-*/
+
         yield return null;
     }
 

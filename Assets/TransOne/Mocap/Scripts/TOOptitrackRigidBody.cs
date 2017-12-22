@@ -36,7 +36,7 @@ public class TOOptitrackRigidBody : MonoBehaviour
 
 	private float tmp_precision_pos;
 	private float tmp_precision_rot;
-
+    private Vector3 scaleCave = Vector3.one;
 	private int sign=1;
     void Start()
     {
@@ -70,7 +70,16 @@ public class TOOptitrackRigidBody : MonoBehaviour
         if(TOInputController.GetInstance != null)
         {
 			(TOInputController.GetInstance).positionTrackers.Add(transform);
+            
         }
+
+        if (TOCAVEController.GetInstance != null)
+        {
+            if(GetComponent<TOCAVEController>() == null)
+            scaleCave = (TOCAVEController.GetInstance).scaleCave;
+
+        }
+
 
     }
 
@@ -100,12 +109,14 @@ public class TOOptitrackRigidBody : MonoBehaviour
 			if (!freezeRotation.z)
 				tmp_rot += new Vector3 (0, 0,Mathf.Round(euAngle.z*tmp_precision_rot)/tmp_precision_rot);
 
-			if (isWorld) {
-				this.transform.position = Vector3.Scale(tmp_pos,scale);
+            Vector3 tmp_scale = Vector3.Scale(scaleCave, scale);
+
+            if (isWorld) {
+				this.transform.position = Vector3.Scale(tmp_pos, tmp_scale);
 				this.transform.eulerAngles = tmp_rot;
 
 			} else {
-				this.transform.localPosition = Vector3.Scale(tmp_pos,scale);
+				this.transform.localPosition = Vector3.Scale(tmp_pos, tmp_scale);
 				this.transform.localEulerAngles = tmp_rot;
 			}
 

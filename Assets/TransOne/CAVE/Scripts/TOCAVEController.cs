@@ -494,6 +494,7 @@ public class TOCAVEController : MonoBehaviour
 		tmp_cam.transform.parent= camerasCAVE.transform;
 		tmp_cam.transform.position = camerasCAVE.transform.position;
 		tmp_cam.transform.rotation = camerasCAVE.transform.rotation;
+        tmp_cam.transform.localScale = scaleCave;
 
 		//Texture initialisation if we use a fake CAVE
 		RenderTexture t = new RenderTexture(1,1,24);
@@ -595,7 +596,7 @@ public class TOCAVEController : MonoBehaviour
 	/// </summary>
 	/// <returns>The vector to inverse</returns>
 	/// <param name="v">V.</param>
-	Vector3 InverseVec3(Vector3 v)
+	public static Vector3 InverseVec3(Vector3 v)
 	{
 		if ((v.x != 0) && (v.y != 0) && (v.z != 0)) return (new Vector3(1 / v.x, 1 / v.y, 1 / v.z));
 		return v;

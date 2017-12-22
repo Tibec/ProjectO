@@ -8,8 +8,9 @@ public class DetectionBounds : MonoBehaviour {
     
     Material bounds;
     Color c;
-    
-  
+
+
+    TOCAVEController CAVEctrl;
     void Start () 
 	{
 
@@ -17,6 +18,7 @@ public class DetectionBounds : MonoBehaviour {
         bounds = GetComponent<MeshRenderer>().material;
         GetComponent<MeshRenderer>().material.mainTextureScale= new Vector2(5 * transform.localScale.x, 5 * transform.localScale.y);
         c = GetComponent<MeshRenderer>().material.GetColor("_TintColor");
+        CAVEctrl = TOCAVEController.GetInstance;
     }
 
 	void Update () 
@@ -32,7 +34,13 @@ public class DetectionBounds : MonoBehaviour {
         {
             for (int i = 0; i < TOInputController.GetInstance.positionTrackers.Count; i++)
             {
-                Vector3 pos = TOInputController.GetInstance.positionTrackers[i].localPosition;
+                Vector3 pos;
+                if (TOInputController.GetInstance.positionTrackers[i].GetComponent<TOCAVEController>() != null)
+                    pos = TOInputController.GetInstance.positionTrackers[i].localPosition;
+                else
+                    pos = Vector3.Scale(TOInputController.GetInstance.positionTrackers[i].localPosition,TOCAVEController.InverseVec3(CAVEctrl.scaleCave));
+
+
                 float dist2 = Vector3.Dot(pos - transform.localPosition, Quaternion.Inverse(transform.parent.rotation) * (-1.0f * transform.forward));
                 if (dist2 < dist)
                     dist = dist2;
