@@ -21,6 +21,9 @@ public class MeubleMenuMgr : MonoBehaviour {
         {
             panels[i].SetActive(i == activePanel);
         }
+
+        assignedFurniture.GetComponent<MeubleInteraction>().HighlightSelection(
+            GetComponentInParent<MenuData>().Enabled);
 	}
 
     public void SetTargetState(bool _free)

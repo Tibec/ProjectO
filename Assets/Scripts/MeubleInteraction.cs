@@ -70,6 +70,8 @@ public class MeubleInteraction : MonoBehaviour {
 
         if(hands.Count == 2 && free && !followHand)
         {
+            if (hands[0] == hands[1])
+                return; // ?? Black magic
             StartCoroutine(CheckTryMove());
         }
     }
@@ -146,6 +148,23 @@ public class MeubleInteraction : MonoBehaviour {
                     material.SetColor("_EmissionColor", Color.black);
                 else
                     material.SetColor("_EmissionColor", Color.Lerp(Color.black, c, intensity));
+
+            }
+        }
+    }
+
+    public void HighlightSelection(bool enable)
+    {
+        MeshRenderer[] r = GetComponentsInChildren<MeshRenderer>();
+        foreach (var mesh in r)
+        {
+            foreach (var material in mesh.materials)
+            {
+                material.EnableKeyword("_EMISSION");
+                if (!enable)
+                    material.SetColor("_EmissionColor", Color.black);
+                else
+                    material.SetColor("_EmissionColor", new Color(1, 0, 0, 0.5f));
 
             }
         }
